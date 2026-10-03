@@ -912,7 +912,7 @@ font-size:14px}
 
 /* Full-height editorial panels, with native scroll snapping. */
 html { scroll-padding-top: 0; scroll-snap-type: y mandatory; }
-[data-panel], .closing { scroll-snap-align: start; scroll-snap-stop: always; }
+[data-panel], .closing { scroll-snap-align: start; scroll-snap-stop: normal; }
 .section { min-height: 100svh; padding-top: clamp(52px, 7vh, 90px); padding-bottom: clamp(52px, 7vh, 90px); }
 .hero { min-height: 100svh; display: flex; flex-direction: column; padding-top: 30px; }
 .hero-layout { flex: 1; padding: 56px 0; align-items: center; }
