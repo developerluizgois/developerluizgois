@@ -1,8 +1,10 @@
+import { initHeroMetrics } from './hero-metrics';
 import './styles/main.css';
 import { initContactForm } from './contact';
 import { trackContactClick } from './analytics';
 
 initContactForm();
+initHeroMetrics();
 
 document.querySelectorAll<HTMLAnchorElement>('[data-cta]').forEach(link => {
   link.addEventListener('click', () => trackContactClick(link.dataset.cta === 'footer' ? 'footer' : 'hero'));

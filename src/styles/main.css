@@ -164,7 +164,7 @@ width:100%;
 padding:25px 25px 20px;
 margin-bottom:4px;
 background:#11203aaa}
-.hero-note>.eyebrow{
+.metric-content>.eyebrow{
 color:#b1bed7;
 font-size:10px}
 .hero-metric{
@@ -177,7 +177,7 @@ font-weight:350}
 font-size:.48em;
 letter-spacing:-.05em;
 margin-left:4px}
-.hero-note>p{
+.metric-content>p{
 color:#b3c0d8;
 font-size:13px;
 line-height:1.55}
@@ -658,7 +658,7 @@ grid-template-columns:1.4fr 1fr;
 padding:70px 0}
 .hero-note{
 padding:22px 18px}
-.hero-note>.eyebrow{
+.metric-content>.eyebrow{
 font-size:9px}
 .hero h1{
 font-size:clamp(54px,7.2vw,80px)}
@@ -733,13 +733,13 @@ padding:24px;
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:0 16px}
-.hero-note>.eyebrow{
+.metric-content>.eyebrow{
 grid-column:1/-1;
 font-size:9px}
 .hero-metric{
 font-size:66px;
 margin:24px 0 0}
-.hero-note>p{
+.metric-content>p{
 font-size:11px;
 align-self:center;
 padding-top:20px}
@@ -900,7 +900,7 @@ min-width:0}
 font-size:clamp(34px,11.6vw,40px)}
 .hero-note{
 grid-template-columns:1fr}
-.hero-note>p{
+.metric-content>p{
 padding-top:15px;
 font-size:12px}
 .hero-metric{
@@ -1006,3 +1006,16 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
   html { scroll-snap-type: none; scroll-behavior: auto; }
 }
 .closing-content { display: block; }
+
+/* Keep a single stable card while its illustrative content changes. */
+.metric-content { transition: opacity .18s ease, transform .18s ease; }
+.metric-content.is-changing { opacity: 0; transform: translateY(5px); }
+.hero-metric [data-metric-value] { font-size: inherit; margin-left: 0; font-variant-numeric: tabular-nums; }
+[data-metric-title] { display: block; min-height: 2.5em; }
+.metric-content > p { min-height: 4.5em; }
+.metric-disclosure { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 18px 0; }
+.metric-disclosure small { max-width: 220px; font-size: 10px; line-height: 1.5; color: #aebed9; }
+.metric-toggle { appearance: none; border: 0; padding: 6px 0; background: none; color: var(--paper); font: inherit; font-size: 11px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.closing-word { margin-bottom: 0; overflow: hidden; padding-bottom: .08em; }
+.footer-bottom { position: relative; margin-top: 28px; padding-bottom: 64px; }
+@media (prefers-reduced-motion: reduce) { .metric-content { transition: none; } }
