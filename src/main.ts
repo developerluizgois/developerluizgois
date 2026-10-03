@@ -1,3 +1,4 @@
+import { initTimeline } from './celebration';
 import { initResultCounts } from './result-counts';
 import './styles/main.css';
 import { initContactForm } from './contact';
@@ -5,6 +6,7 @@ import { trackContactClick, trackJourneyClick } from './analytics';
 
 initContactForm();
 initResultCounts();
+initTimeline();
 
 document.querySelectorAll<HTMLAnchorElement>('[data-cta]').forEach(link => {
   link.addEventListener('click', () => trackContactClick(link.dataset.cta === 'footer' ? 'footer' : 'hero'));

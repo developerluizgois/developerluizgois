@@ -1,3 +1,4 @@
+import { showSuccessNotification } from './celebration';
 import type { LeadPayload } from '../shared/lead';
 import { trackForm } from './analytics';
 
@@ -54,7 +55,7 @@ export function initContactForm(): void {
     status.textContent = next === 'success'
       ? 'Recebi sua mensagem. Vou analisar o contexto e entrar em contato com você.'
       : next === 'error' ? errorMessage : submitting ? 'Enviando sua solicitação…' : '';
-    if (next === 'success') { form.reset(); started = false; }
+    if (next === 'success') { form.reset(); started = false; showSuccessNotification(); }
   }
   form.addEventListener('submit', async (event) => {
     event.preventDefault();

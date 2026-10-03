@@ -278,3 +278,50 @@ em { font: inherit; }
 .proof-possibility p { color: #58616e; }
 .outcome-label { display: block; margin-top: auto; padding-top: 24px; font-size: 11px; color: #304b75; }
 @media (max-width: 700px) { .proof-possibility { grid-column: 1 / -1; }.proof-linked { padding-top: 48px; } }
+
+.scenario-number { display: block; font-size: clamp(40px, 4vw, 64px); margin-top: 25px; color: var(--ink); }
+.scenario-note { grid-column: 1 / -1; max-width: 760px; color: var(--muted); font-size: 12px; padding: 8px 0; }
+.process { background: #fff; }
+.project-timeline { list-style: none; margin: 10px 0 0; padding: 0; max-width: 1050px; width: 100%; align-self: center; }
+.timeline-step { position: relative; padding: 0 0 42px 88px; }
+.timeline-step:not(:last-child)::before { content: ''; position: absolute; left: 26px; top: 54px; bottom: 0; width: 1px; background: #ced4de; }
+.timeline-icon { position: absolute; left: 0; top: 0; width: 54px; height: 54px; display: grid; place-items: center; border: 1px solid #ced4de; border-radius: 50%; background: #f3f4f5; color: #304b75; }
+.timeline-icon svg { width: 25px; height: 25px; }
+.timeline-content { padding-top: 4px; }
+.timeline-content h3 { font-size: clamp(22px, 2.5vw, 32px); margin: 10px 0; letter-spacing: -.025em; }
+.timeline-content > p { max-width: 660px; font-size: 15px; color: var(--muted); }
+.parallel-tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 25px 0 0; }
+.parallel-tracks > div { position: relative; background: var(--dark); color: white; padding: 26px; border-radius: 16px; }
+.parallel-tracks h4 { font-weight: 400; margin: 12px 0; }
+.parallel-tracks p { font-size: 13px; color: #c2d3f5; }
+.track-dot { display: block; width: 7px; height: 7px; background: #c2d3f5; border-radius: 50%; }
+.timeline-result .timeline-content { background: #2a1e1a; color: #fff; padding: 28px; border-radius: 18px; }
+.timeline-result .timeline-content p { color: #d4c4bc; }
+.timeline-result .timeline-icon { background: #2a1e1a; color: #ddc6ae; border-color: #2a1e1a; }
+.result-sparks { display: inline-block; color: #ddc6ae; margin-top: 20px; font-size: 24px; letter-spacing: .4em; }
+.success-toast { position: fixed; z-index: 100; top: 90px; right: 24px; display: flex; gap: 14px; align-items: flex-start; width: min(430px, calc(100vw - 32px)); padding: 22px; border: 1px solid #ced4de; border-radius: 16px; background: white; color: var(--ink); box-shadow: 0 16px 60px #0c183030; }
+.success-toast strong { font-weight: 400; font-size: 17px; }
+.success-toast p { font-size: 13px; margin-top: 5px; color: var(--muted); }
+.success-toast button { background: none; border: 0; color: var(--ink); cursor: pointer; margin-left: auto; font-size: 24px; padding: 0 4px; }
+.toast-check { border-radius: 50%; background: var(--ink); color: white; padding: 4px 8px; }
+.confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 99; }
+.confetti i { position: absolute; top: -20px; width: 8px; height: 13px; animation: confetti-fall 3s linear both; }
+@keyframes confetti-fall { from { transform: translate3d(0,-20px,0) rotate(0); } to { transform: translate3d(var(--drift),110vh,0) rotate(720deg); } }
+@keyframes timeline-arrive { from { transform: translateY(18px); opacity: .45; } to { transform: translateY(0); opacity: 1; } }
+@keyframes celebrate { 0%,100% { transform: scale(1) rotate(0); } 35% { transform: scale(1.16) rotate(-8deg); } 70% { transform: scale(1.1) rotate(8deg); } }
+@media (prefers-reduced-motion: no-preference) {
+ .timeline-step.is-visible .timeline-content { animation: timeline-arrive .6s ease both; }
+ .timeline-step.is-visible .timeline-icon, .timeline-result.is-visible .result-sparks { animation: celebrate .8s ease 2; }
+ .timeline-step.is-visible .track-dot { animation: celebrate 1.5s ease 3; }
+ .success-toast { animation: timeline-arrive .3s ease both; }
+}
+@media (max-width: 700px) {
+ .top-nav a { padding: 11px 9px; font-size: 10px; }
+ .timeline-step { padding-left: 58px; }
+ .timeline-icon { width: 40px; height: 40px; }.timeline-icon svg { width: 21px; }
+ .timeline-step:not(:last-child)::before { left: 19px; top: 40px; }
+ .parallel-tracks { grid-template-columns: 1fr; }
+ .timeline-result .timeline-content { padding: 22px; }
+ .success-toast { right: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .confetti { display: none; } }
