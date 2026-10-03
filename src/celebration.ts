@@ -23,16 +23,3 @@ export function showSuccessNotification(): void {
   document.body.append(confetti);
   window.setTimeout(() => confetti.remove(), 5000);
 }
-
-export function initTimeline(): void {
-  const steps = document.querySelectorAll('.timeline-step');
-  if (reducedMotion() || !('IntersectionObserver' in window)) return;
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-visible');
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: .25 });
-  steps.forEach(step => observer.observe(step));
-}
