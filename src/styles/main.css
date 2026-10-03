@@ -265,3 +265,16 @@ em { font: inherit; }
 .results-heading { display: block; }
 .solutions .services { max-width: 1100px; }
 [data-count] { font: inherit !important; color: inherit !important; letter-spacing: inherit; font-variant-numeric: tabular-nums; }
+
+/* Fine engineering grid over the existing solid navy surface. */
+.hero { position: relative; isolation: isolate; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .055; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M64 0H0V64' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E"); }
+.proof-linked { position: relative; padding-top: 48px; transition: box-shadow .2s; }
+.proof-external { position: absolute; right: 20px; top: 15px; font-size: 23px; line-height: 1; }
+.proof-linked:hover { box-shadow: 0 0 0 2px #819ac0; }
+.proof-linked:focus-visible { outline: 3px solid #6487bb; outline-offset: 4px; }
+.proof-possibility { background: #f3f4f5; display: flex; flex-direction: column; }
+.proof-possibility .eyebrow { color: #596579; }
+.proof-possibility p { color: #58616e; }
+.outcome-label { display: block; margin-top: auto; padding-top: 24px; font-size: 11px; color: #304b75; }
+@media (max-width: 700px) { .proof-possibility { grid-column: 1 / -1; }.proof-linked { padding-top: 48px; } }
