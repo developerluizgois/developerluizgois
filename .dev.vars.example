@@ -1,0 +1,2 @@
+# Optional local-only configuration. Never commit the real value.
+HUBSPOT_SERVICE_KEY=

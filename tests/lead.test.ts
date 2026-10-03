@@ -1,0 +1,113 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { validateLead } from '../worker/validation';
+import { saveLead, consentTimestamp } from '../worker/hubspot';
+import worker from '../worker/index';
+import { createSubmission } from '../src/contact';
+import type { FormState } from '../src/contact';
+
+const lead = { name: 'Maria Teste', email: 'maria@example.com', companyOrProduct: 'Produto teste', challenge: 'Quero melhorar a conversão do produto.', consent: true as const };
+const config = { HUBSPOT_SERVICE_KEY: 'unit-test-only', HUBSPOT_PIPELINE_ID: 'default', HUBSPOT_STAGE_NEW_ID: 'appointmentscheduled' };
+const receivedAt = new Date('2026-10-02T15:22:33.444Z');
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+describe('server validation', () => {
+  it('normalizes text and omits empty optional phone', () => {
+    expect(validateLead({ ...lead, name: '  Maria   Teste ', email: ' MARIA@example.com ', whatsapp: '   ' })).toEqual(lead);
+    expect(validateLead({ ...lead, whatsapp: '+55 (48) 99999-9999' }).whatsapp).toBe('+5548999999999');
+  });
+  it.each([
+    { consent: false }, { consent: undefined }, { websiteCheck: 'spam' }, { email: 'invalid' },
+    { whatsapp: 'abc' }, { name: ' ' }, { challenge: 'short' }, { companyOrProduct: 'x'.repeat(161) },
+    { unexpected: 'field' }, { name: null },
+  ])('rejects invalid payload %j', patch => { expect(() => validateLead({ ...lead, ...patch })).toThrow(); });
+});
+
+describe('HubSpot mapping without external calls', () => {
+  function fakeApi(existing: boolean) {
+    return vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
+      const path = String(url);
+      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
+      if (init?.method === 'GET') return existing ? Response.json({ id: '101' }) : new Response(null, { status: 404 });
+      if (path.includes('/associations/default/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
+      if (path.endsWith('/contacts') || path.endsWith('/contacts/101')) return Response.json({ id: '101' });
+      if (path.endsWith('/deals')) return Response.json({ id: '202' });
+      throw new Error('Unexpected endpoint');
+    });
+  }
+  it.each([true, false])('updates/creates contact and creates a new associated deal (existing=%s)', async existing => {
+    const api = fakeApi(existing);
+    await saveLead(lead, config, receivedAt, api);
+    const contactWrite = api.mock.calls.find(([url, init]) => String(url).includes('/contacts') && ['POST', 'PATCH'].includes(init?.method || ''))!;
+    const props = JSON.parse(String(contactWrite[1]?.body)).properties;
+    expect(contactWrite[1]?.method).toBe(existing ? 'PATCH' : 'POST');
+    expect(props).toEqual({ firstname: lead.name, email: lead.email, consentimento_pelo_site: 'true', data_do_consentimento_pelo_site: receivedAt.toISOString() });
+    expect(props).not.toHaveProperty('mobilephone');
+    const dealWrite = api.mock.calls.find(([url]) => String(url).endsWith('/deals'))!;
+    expect(JSON.parse(String(dealWrite[1]?.body)).properties).toEqual({ dealname: 'Site | Produto teste | Maria Teste', pipeline: 'default', dealstage: 'appointmentscheduled', empresa_ou_produto: lead.companyOrProduct, desafio_do_projeto: lead.challenge, origem_do_lead: 'Site' });
+    expect(api.mock.calls.at(-1)?.[0]).toBe('https://api.hubapi.com/crm/v4/objects/deals/202/associations/default/contacts/101');
+  });
+  it('sends phone only when provided and formats the actual property type', async () => {
+    const api = fakeApi(true);
+    await saveLead({ ...lead, whatsapp: '+5548999999999' }, config, receivedAt, api);
+    const patch = api.mock.calls.find(([, init]) => init?.method === 'PATCH')!;
+    expect(JSON.parse(String(patch[1]?.body)).properties.mobilephone).toBe('+5548999999999');
+    expect(consentTimestamp('datetime', receivedAt)).toBe('2026-10-02T15:22:33.444Z');
+    expect(consentTimestamp('date', receivedAt)).toBe('2026-10-02');
+    expect(() => consentTimestamp('string', receivedAt)).toThrow();
+  });
+  it('does not confirm success for provider errors or unfinished associations', async () => {
+    await expect(saveLead(lead, config, receivedAt, vi.fn<typeof fetch>().mockResolvedValue(new Response('private provider detail', { status: 500 })))).rejects.toThrow('Lead processing unavailable');
+    const api = fakeApi(true);
+    const original = api.getMockImplementation()!;
+    api.mockImplementation(async (url, init) => String(url).includes('/associations/default/') ? Response.json({ status: 'PENDING', results: [] }) : original(url, init));
+    await expect(saveLead(lead, config, receivedAt, api)).rejects.toThrow();
+  });
+});
+
+describe('public endpoint', () => {
+  const env = { ...config, ASSETS: { fetch: vi.fn(async () => new Response('asset')) } };
+  it.each([
+    ['GET', {}, undefined, 405],
+    ['POST', { 'Content-Type': 'text/plain' }, '{}', 415],
+    ['POST', { 'Content-Type': 'application/json', Origin: 'https://elsewhere.test' }, '{}', 403],
+    ['POST', { 'Content-Type': 'application/json' }, '{invalid', 400],
+    ['POST', { 'Content-Type': 'application/json' }, 'x'.repeat(17000), 413],
+  ] as const)('rejects unsupported/invalid requests without provider calls', async (method, headers, body, status) => {
+    const api = vi.fn(); vi.stubGlobal('fetch', api);
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method, headers, body }), env);
+    expect(response.status).toBe(status);
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBeNull();
+    expect(api).not.toHaveBeenCalled();
+  });
+  it('fails safely without secrets and never exposes internals', async () => {
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), { ...env, HUBSPOT_SERVICE_KEY: '' });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ success: false, message: 'Não foi possível enviar sua solicitação. Tente novamente.' });
+  });
+});
+
+describe('form submission and analytics', () => {
+  it('prevents concurrent submissions and emits a conversion only after complete success', async () => {
+    vi.stubGlobal('window', { dataLayer: [] });
+    let resolve!: (value: Response) => void;
+    const api = vi.fn<typeof fetch>(() => new Promise<Response>(done => { resolve = done; }));
+    const submit = createSubmission(api);
+    const states: FormState[] = [];
+    const first = submit(lead, next => states.push(next));
+    expect(await submit(lead, next => states.push(next))).toBe(false);
+    expect(api).toHaveBeenCalledTimes(1);
+    expect(window.dataLayer).toEqual([]);
+    resolve(Response.json({ success: true }));
+    expect(await first).toBe(true);
+    expect(states).toEqual(['submitting', 'success']);
+    expect(window.dataLayer).toEqual([{ event: 'generate_lead', form_provider: 'hubspot' }]);
+  });
+  it('does not generate a lead on error/202 and permits retry', async () => {
+    vi.stubGlobal('window', { dataLayer: [] });
+    const api = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({ success: true }, { status: 202 })).mockResolvedValueOnce(Response.json({ success: true }));
+    const submit = createSubmission(api);
+    expect(await submit(lead, () => {})).toBe(false);
+    expect(window.dataLayer).toEqual([]);
+    expect(await submit(lead, () => {})).toBe(true);
+  });
+});

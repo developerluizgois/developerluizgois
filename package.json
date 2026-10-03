@@ -3,11 +3,23 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "dev": "node scripts/serve.mjs",
-    "build": "node scripts/build.mjs",
-    "test": "node --test tests/*.test.js",
-    "check": "node --check main.js && node --check contact.js && node --check config.js && npm test && npm run build"
+    "dev": "vite --host 127.0.0.1 --port 4173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "test": "vitest run",
+    "check": "tsc --noEmit",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.62.5",
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3",
+    "wrangler": "^4.147.0"
   }
 }
