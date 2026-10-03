@@ -4,6 +4,7 @@ Landing de página única, em português, com **Vite + Vanilla TypeScript + CSS*
 
 ## Rodar localmente
 
+
 Use Node.js 22.12+ (Node 24 recomendado).
 
 ```sh
