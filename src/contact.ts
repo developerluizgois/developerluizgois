@@ -49,7 +49,7 @@ export function initContactForm(): void {
     button.disabled = submitting;
     fieldset.disabled = submitting;
     form.setAttribute('aria-busy', String(submitting));
-    button.textContent = submitting ? 'Enviando sua mensagem…' : 'Enviar minha mensagem';
+    button.textContent = submitting ? 'Enviando sua mensagem…' : 'Solicitar uma análise';
     status.dataset.state = next;
     status.textContent = next === 'success'
       ? 'Recebi sua mensagem. Vou analisar o contexto e entrar em contato com você.'

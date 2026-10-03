@@ -108,7 +108,7 @@ O botão é bloqueado durante envio, inclusive contra submissões concorrentes. 
 - `vite.config.ts`, `wrangler.jsonc`, `tsconfig.json`, `vitest.config.ts`, `package-lock.json`: tooling/configuração.
 - Scripts artesanais anteriores e o fluxo provisório de contato foram removidos.
 
-O scroll usa `scroll-snap` nativo: seções de no mínimo uma tela e encaixe obrigatório no desktop; aproximação no celular para permitir leitura de seções longas e preenchimento com teclado aberto. Conteúdo que ultrapassa uma tela continua acessível. `prefers-reduced-motion` desativa o encaixe e animações. Não existe captura de eventos wheel nem bloqueio de rolagem.
+O scroll usa `scroll-snap` nativo: seções de no mínimo uma tela e encaixe obrigatório no desktop; altura natural e aproximação no celular para permitir leitura de seções longas e preenchimento com teclado aberto. Conteúdo que ultrapassa uma tela continua acessível. `prefers-reduced-motion` desativa o encaixe e animações. Não existe captura de eventos wheel nem bloqueio de rolagem.
 
 Somente LinkedIn, X e Instagram aparecem como links externos na página, todos no rodapé. A imagem nova é preservada em sua versão original; o recorte é responsivo via CSS. A fonte Geist é servida localmente sob a licença incluída.
 
@@ -129,3 +129,49 @@ Não foram usados HubSpot real, Cloudflare remoto, chave real ou deploy. A valid
 **Limitação operacional:** contato, negócio e associação são operações separadas na API externa, sem transação distribuída. Se ocorrer falha depois da criação de um negócio, ele pode existir sem associação; um novo envio pode criar outro negócio. Também existe resultado indeterminado quando o provedor processa uma escrita mas a resposta se perde. O site não declara sucesso nessas situações. Revise negócios do período no CRM antes de repetir uma solicitação com resultado incerto. Não foi introduzido banco, fila, propriedade de idempotência ou rollback destrutivo fora do escopo.
 
 Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-plugin/get-started/), [Static Assets](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/), [HubSpot Contacts](https://developers.hubspot.com/docs/api-reference/legacy/crm/objects/contacts/guide), [propriedades e datas](https://developers.hubspot.com/docs/api-reference/legacy/crm/properties/guide).
+
+## SEO e medição em produção
+
+O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois | Software e IA**. O build normal de produção gera:
+
+- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card com o retrato de Luiz.
+- Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
+- JSON-LD com Person, WebSite e WebPage, nome, serviços descritos, retrato e perfis sociais reais. Não inclui números ilustrativos, avaliações ou resultados inventados.
+- `robots.txt` permitindo rastreamento da landing e informando o sitemap; `/api/` fica fora do rastreamento.
+- `sitemap.xml` contendo apenas a página canônica. Não há datas de atualização fictícias nem URLs separadas para cada seção.
+- Conteúdo e metadados no HTML entregue pelo servidor, sem depender da execução de JavaScript pelo buscador. Um H1, títulos de seção, formulário com labels e retrato com dimensões e texto alternativo.
+- Fonte local com preload; CSS/JS versionados pelo Vite. O retrato continua lazy loaded. Os exemplos fictícios do componente animado usam `data-nosnippet` para não compor descrições de busca.
+- URLs inexistentes não usam fallback de SPA (`not_found_handling: none`), evitando páginas desconhecidas respondendo com a landing e status 200.
+
+A variável **de build** `SITE_URL` pode substituir o domínio, se necessário. Não é secret nem configuração do frontend em runtime. O padrão de produção já é `https://luizgois.com/`. `npm run dev` e builds com `--mode staging` geram `noindex, nofollow`, sem canonical/sitemap de produção. Use modo staging nas previews públicas. Não publique um build staging no domínio principal. Alterar o domínio exige rebuild.
+
+### Depois de publicar
+
+1. Confirmar HTTPS e status 200 em `https://luizgois.com/`, `/robots.txt`, `/sitemap.xml` e na imagem social. Confirmar 404 em uma URL inexistente e ausência de `noindex` na raiz de produção.
+2. Configurar na Cloudflare redirecionamento permanente de HTTP e de `www.luizgois.com` para HTTPS sem www, preservando caminho e parâmetros de campanha. Não aplicar redirecionamento de domínio a previews de desenvolvimento.
+3. Verificar a propriedade de domínio `luizgois.com` no Google Search Console via DNS. Enviar `/sitemap.xml`, inspecionar a raiz e solicitar indexação. A conta e o DNS não foram alterados por esta implementação.
+4. Conferir os dados estruturados no Schema Markup Validator e a leitura da página na inspeção de URL do Search Console. Esses tipos não prometem um resultado enriquecido específico. O Google decide título, descrição e indexação finais.
+5. Conferir PageSpeed Insights/Core Web Vitals na URL pública, também no celular. A foto original tem cerca de 2,8 MB; versões menores em WebP/AVIF são uma melhoria futura possível, sem bloqueio funcional. Nenhuma pontuação de performance foi medida ou prometida.
+
+### GTM → GA4 → Ads
+
+O container **GTM-KW3WSNGQ** continua sendo o único ponto de instalação. Não adicione um segundo snippet GA4/Ads ao código da página.
+
+1. No GTM, criar a Google tag com o ID real de medição GA4 e o disparo de page_view configurado uma única vez por carregamento. Esta landing é uma página única: mudanças de hash como `#contato` não devem criar page_views artificiais por History Change.
+2. Criar triggers de Custom Event com nomes exatos `contact_click`, `contact_form_start` e `generate_lead`, associados às respectivas tags de evento GA4. Usar as variáveis de Data Layer `placement` e `form_provider` quando presentes. São parâmetros sem dados pessoais.
+3. Marcar `generate_lead` como evento principal no GA4. Ele só ocorre após HTTP 200 e `success: true`, com confirmação do contato, negócio e associação. `form_submit`, `contact_click` e `contact_form_start` não comprovam conversão. Se a medição automática de formulários do GA4 gerar ruído, desativá-la e manter os eventos explícitos.
+4. Para Ads, escolher uma única conversão principal para o mesmo lead: importar o evento principal do GA4 OU disparar a tag de conversão Ads em `generate_lead`. Não contar as duas como conversões principais da mesma ação. Configurar Conversion Linker/Google tag conforme o caminho escolhido.
+5. Configurar consentimento de Analytics e publicidade no GTM/CMP antes de publicar essas tags. O checkbox do formulário autoriza o tratamento da solicitação, não cookies ou personalização de anúncios. Não há CMP implementada nesta entrega; a configuração de tags e consentimento pertence à próxima etapa.
+6. No Tag Assistant/GA4 DebugView, conferir page_view único, clique, início do formulário, erro sem generate_lead e sucesso com um único generate_lead. Validar UTMs e auto tagging Ads na URL pública. Não enviar nome, email, telefone ou desafio como parâmetros de eventos, nem habilitar coleta desses campos por seletores automáticos.
+
+GTM instalado não significa que GA4/Ads já estejam recebendo eventos. IDs, tags, consentimento e publicação do container ainda precisam ser configurados pelo proprietário. Search Console mede a presença na busca; GA4 mede o uso do site. Instalar Analytics não garante nem melhora diretamente o posicionamento.
+
+Fontes oficiais: [títulos na busca](https://developers.google.com/search/docs/appearance/title-link), [canonical](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap), [eventos GA4 no GTM](https://support.google.com/tagmanager/answer/13034206), [generate_lead](https://developers.google.com/analytics/devguides/collection/ga4/reference/events#generate_lead).
+
+## Revisão da comunicação
+
+A landing tem cinco blocos: promessa, dores e soluções, resultados reais, apresentação com método de trabalho e formulário. A seção separada de processo foi incorporada à apresentação para encurtar a jornada. Atendimento no WhatsApp, melhorias de experiência e dashboards aparecem como soluções para problemas de engajamento, conversão e retenção, com ou sem IA.
+
+O componente de exemplos mantém cinco variações e contagem animada, identificado como ilustrativo. Os resultados atribuídos à Woke permanecem separados. O fundo do hero usa apenas gradientes e arcos CSS com uma animação de entrada finita, sem vídeo, biblioteca ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
+
+Validação desta revisão: TypeScript, 30 testes, build de produção, inspeção de título, canonical, sitemap, robots e JSON-LD; conferência visual desktop e mobile. Testes reais de HubSpot, GA4, Ads, Search Console e deploy continuam pendentes conforme os passos acima.
