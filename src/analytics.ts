@@ -13,3 +13,8 @@ export function trackContactClick(placement: 'hero' | 'footer'): void {
   window.dataLayer ??= [];
   window.dataLayer.push({ event: 'contact_click', placement });
 }
+
+export function trackJourneyClick(): void {
+  window.dataLayer ??= [];
+  window.dataLayer.push({ event: 'journey_click', placement: 'hero', destination: 'resultados' });
+}

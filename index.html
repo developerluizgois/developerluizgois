@@ -25,17 +25,40 @@
 <body>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KW3WSNGQ" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
-<nav class="section-progress" aria-label="Navegar pelas seções"><a href="#inicio" aria-label="Início" aria-current="location"><span></span></a><a href="#servicos" aria-label="Serviços"><span></span></a><a href="#resultados" aria-label="Resultados"><span></span></a><a href="#sobre" aria-label="Sobre Luiz"><span></span></a><a href="#contato" aria-label="Contato"><span></span></a></nav>
+<nav class="top-nav" aria-label="Navegar pelas seções" data-theme="dark">
+    <a href="#inicio" aria-current="location">Início</a><a href="#resultados">Resultados</a><a href="#servicos">Soluções</a><a href="#sobre">Sobre mim</a><a href="#contato">Contato</a>
+  </nav>
   <main id="conteudo">
-    <section class="hero" data-panel id="inicio" aria-labelledby="hero-title">
+    <section class="hero" data-panel data-nav-theme="dark" id="inicio" aria-labelledby="hero-title">
       <div class="hero-flow" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="hero-layout">
-        <div class="hero-copy">
-          <h1 id="hero-title">Mais clientes.<br><em>Menos obstáculos.</em></h1>
-          <p>As pessoas chegam, mas não avançam? Melhoro seu site, software e atendimento para transformar interesse em compra e motivos para ficar.</p>
-          <a class="button button-light" href="#contato" data-cta="hero">Quero melhorar meu resultado</a>
-        </div>
-        <aside class="hero-note" aria-label="Exemplos ilustrativos de impacto">
+      <div class="hero-copy">
+        <h1 id="hero-title">Seu mercado evoluiu.<br><em>Seu negócio também pode.</em></h1>
+        <p>Aplico engenharia e IA para resolver o que limita suas vendas e transformar dados e processos em inteligência para o seu negócio.</p>
+        <a class="button button-light" href="#resultados" data-journey="hero">Quero melhorar meu resultado <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <section class="results section" data-panel data-nav-theme="light" id="resultados" aria-labelledby="results-title">
+      <div class="section-heading results-heading"><div><span class="eyebrow">01 / Resultados que já construí</span><h2 id="results-title">Da oportunidade<br>ao <em>impacto real.</em></h2></div><p>Produto, engenharia e IA trabalhando juntos. Estes são resultados da minha atuação na Woke, em colaboração com os times de produto e engenharia.</p></div>
+      <div class="proof-mosaic">
+        <article class="proof-card proof-hunter"><span class="eyebrow">AI Job Hunter · Recomendação com IA</span><h3>Oportunidades certas.<br>Em escala.</h3><div class="proof-primary"><strong>30 mil<span>+</span></strong><p>usuários na base que recebeu o serviço</p></div><div class="opportunity-lines" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="proof-pair"><div><strong>150 mil+</strong><p>oportunidades mapeadas</p></div><div><strong>50 mil+</strong><p>recomendações por mês</p></div></div></article>
+        <article class="proof-card proof-conversion"><span class="eyebrow">WCarreiras · Conversão</span><h3>Uma jornada mais clara.<br>Mais contas convertidas.</h3><div class="conversion-bars" role="img" aria-label="Conversão de novas contas: de menos de 1% para aproximadamente 3%"><div><strong>&lt;1%</strong><i></i><span>Antes</span></div><div><strong>~3%</strong><i></i><span>Depois</span></div></div><p>Redesenho da aquisição, ativação e monetização, contribuindo para elevar a conversão.</p></article>
+        <article class="proof-card proof-engagement"><span class="eyebrow">WCarreiras · Engajamento</span><strong class="standout">+22,8<span>%</span></strong><h3>Mais pessoas<br>usando o produto.</h3><p>Aumento no engajamento de usuários ativos com o Board de oportunidades, que também trouxe um novo ciclo de feedback para as recomendações.</p></article>
+        <article class="proof-card proof-operations"><div class="operation-intro"><span class="eyebrow">Recrutamento · Agentes de IA</span><h3>Menos esforço manual.<br>Mais capacidade de operação.</h3><p>Agentes adotados no recrutamento de <strong>25 empresas</strong>, com mais de <strong>40 mil candidatos processados</strong>.</p></div><div class="operation-metric"><strong>2 dias <span>→</span> 15 min</strong><p>na definição da estratégia de busca, para mais de 2 mil posições</p></div><div class="operation-metric"><strong>~50 <span>em</span> 5 min</strong><p>candidatos avaliados previamente e disponíveis para a equipe</p></div></article>
+      </div>
+      <p class="result-note">Cada resultado tem seu contexto. O próximo projeto começa pelas metas e pela realidade da sua empresa.</p>
+    </section>
+
+    <section class="solutions section" data-panel data-nav-theme="dark" id="servicos" aria-labelledby="services-title">
+      <div class="section-heading"><span class="eyebrow">02 / O que podemos resolver no seu negócio</span><h2 id="services-title">Onde você vê um gargalo,<br><em>eu construo um caminho.</em></h2><p>Do diagnóstico à solução em produção. Páginas, software, serviços, integrações e agentes de IA sob medida para o que sua empresa precisa alcançar.</p></div>
+      <div class="solutions-layout"><div class="services">
+        <details name="solutions" open><summary><span class="service-number">01</span><h3>O WhatsApp recebe mais contatos do que seu time consegue atender?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Construo agentes de IA conectados aos seus processos para orientar o lead, responder dúvidas e encaminhar ao time quando necessário. Menos oportunidades esperando, mais tempo para as conversas que exigem atenção humana.</p><span class="solution-tools">Agentes de IA · Integrações · Automação</span></div></details>
+        <details name="solutions"><summary><span class="service-number">02</span><h3>Conversas e dados se acumulam, mas não viram decisões?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Conecto feedbacks, reclamações e dados de uso em uma inteligência operacional que revela padrões, prioriza demandas e gera alertas. Dashboards e fluxos de análise ajudam sua empresa a aprender com cada cliente.</p><span class="solution-tools">Pipelines de dados · Dashboards · Análise de comportamento</span></div></details>
+        <details name="solutions"><summary><span class="service-number">03</span><h3>Seu site ou SaaS atrai pessoas, mas perde vendas e clientes?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Investigo o caminho da visita à assinatura e ao uso recorrente. Construo páginas, funcionalidades e integrações que reduzem atritos no cadastro, na ativação e na compra, com medição para acompanhar conversão e retenção.</p><span class="solution-tools">Software personalizado · SaaS · Funis e experimentação</span></div></details>
+        <details name="solutions"><summary><span class="service-number">04</span><h3>Seu produto precisa de IA que faça parte da experiência?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Implemento busca inteligente, recomendações, análise de documentos e assistentes conectados ao contexto do produto. Com critérios de qualidade e acompanhamento para entregar valor no uso real.</p><span class="solution-tools">RAG · LangGraph · Sistemas de recomendação</span></div></details>
+        <details name="solutions"><summary><span class="service-number">05</span><h3>Sua operação cresceu, mas ainda depende de copiar, conferir e repetir?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Mapeio o fluxo completo e construo serviços, integrações e automações que conectam seus sistemas. Sua equipe ganha capacidade e consistência para cuidar do que realmente exige julgamento.</p><span class="solution-tools">APIs · Serviços em nuvem · Workflows inteligentes</span></div></details>
+        <details name="solutions"><summary><span class="service-number">06</span><h3>A estrutura técnica está limitando o próximo passo?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Atuo na arquitetura, performance e confiabilidade para sustentar o crescimento. Da consultoria de TI à implementação, com decisões técnicas ligadas ao custo, à escala e às prioridades do negócio.</p><span class="solution-tools">TypeScript · Python · AWS · PostgreSQL · Observabilidade</span></div></details>
+      </div><div class="solution-aside"><span class="eyebrow">Possibilidades de transformação</span>        <aside class="impact-example" aria-label="Exemplos ilustrativos de impacto">
           <div class="metric-content" data-nosnippet>
             <span class="eyebrow" data-metric-title>Experiências que engajam</span>
             <div class="hero-metric" aria-label="Mais 28,8 por cento"><span data-metric-value aria-hidden="true">+28,8</span><span aria-hidden="true">%</span></div>
@@ -44,42 +67,18 @@
             <div class="note-footer eyebrow"><span data-metric-category>Experiência do produto</span><span data-metric-index>01 / 05</span></div>
           </div>
           <div class="metric-disclosure"><small>Exemplos ilustrativos, não resultados de projetos.</small><button type="button" class="metric-toggle" aria-label="Pausar exemplos">Pausar</button></div>
-          <a class="text-link" href="#resultados">Conheça o contexto</a>
-        </aside>
-      </div>
-      <div class="hero-bottom"><a href="#servicos" aria-label="Explorar soluções">Veja como posso ajudar <span aria-hidden="true">↓</span></a></div>
+          <a class="text-link" href="#resultados">Veja os resultados reais <span aria-hidden="true">↗</span></a>
+        </aside></div></div>
     </section>
 
-    <section class="intro section" data-panel id="servicos" aria-labelledby="services-title">
-      <div class="section-label"><span class="eyebrow">01 / Onde seu cliente para?</span></div>
-      <div class="section-heading"><h2 id="services-title">Cada barreira removida.<br><em>Um passo adiante.</em></h2><p>Do primeiro acesso à próxima compra, encontro o que atrapalha e construo a solução.</p></div>
-      <div class="services">
-        <details name="solutions" open><summary><span class="service-number">01</span><h3>Recebe visitas, mas ninguém avança?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Identifico onde as pessoas desistem e simplifico a navegação, o cadastro e os primeiros passos. Para que o valor do seu produto apareça mais cedo.</p></div></details>
-        <details name="solutions"><summary><span class="service-number">02</span><h3>Há interesse, mas a compra não acontece?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Melhoro a jornada até a compra e o atendimento. De uma página mais clara a um agente de IA no WhatsApp, o objetivo é ajudar seu cliente a decidir.</p></div></details>
-        <details name="solutions"><summary><span class="service-number">03</span><h3>Os clientes assinam, mas não ficam?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Investigo o que leva ao abandono e melhoro a experiência de uso. Menos esforço para encontrar valor, mais motivos para continuar.</p></div></details>
-        <details name="solutions"><summary><span class="service-number">04</span><h3>Faltam dados para saber por onde começar?</h3><span class="service-toggle" aria-hidden="true"></span></summary><div class="service-body"><p>Organizo os dados de uso em dashboards e funis de engajamento, conversão e retenção. Você enxerga as perdas e decide o que melhorar primeiro.</p></div></details>
-      </div>
-    </section>
-
-    <section class="results section" data-panel id="resultados" aria-labelledby="results-title">
-      <div class="section-label"><span class="eyebrow">02 / Mudanças que fazem diferença</span></div>
-      <h2 id="results-title">Menos fricção.<br><em>Resultado na prática.</em></h2>
-      <div class="outcomes">
-        <article><span class="eyebrow">Mais conversão</span><strong>&lt;1% <span>→</span> ~3%</strong><p>Conversão de novas contas após a evolução da jornada de aquisição e ativação.</p></article>
-        <article><span class="eyebrow">Mais engajamento</span><strong>+22,8<span>%</span></strong><p>Engajamento de usuários ativos com uma nova experiência de gestão de oportunidades.</p></article>
-        <article><span class="eyebrow">Menos trabalho manual</span><strong>2 dias <span>→</span> 15 min</strong><p>Na definição da estratégia de busca de candidatos, com apoio de IA.</p></article>
-      </div>
-      <p class="result-note">Resultados da minha atuação na Woke, junto aos times de produto e engenharia. Cada projeto tem seu contexto.</p>
-    </section>
-
-    <section class="about section" data-panel id="sobre" aria-labelledby="about-title">
+    <section class="about section" data-panel data-nav-theme="light" id="sobre" aria-labelledby="about-title">
       <div class="portrait"><img src="/assets/luiz-gois.jpg" width="3452" height="4274" loading="lazy" decoding="async" alt="Retrato de Luiz Gois"></div>
-      <div class="about-copy"><span class="eyebrow">03 / Quem resolve com você</span><h2 id="about-title">Luiz Gois<span>.</span></h2><p class="about-role">Engenheiro de software. Parceiro do seu negócio.</p><p>Conecto comportamento, dados e tecnologia para melhorar a experiência do seu cliente. Com IA quando ela faz sentido, e sempre com uma solução viável para o seu negócio.</p>
-        <ol class="working-steps" id="processo"><li><span>01</span><div><h3>Entendo a perda.</h3><p>Olho para a jornada, os dados e sua prioridade.</p></div></li><li><span>02</span><div><h3>Construo a melhoria.</h3><p>Coloco a solução em prática, junto com você ou seu time.</p></div></li><li><span>03</span><div><h3>Acompanho o resultado.</h3><p>Medimos o que mudou e o próximo passo.</p></div></li></ol>
+      <div class="about-copy"><span class="eyebrow">03 / Quem constrói com você</span><h2 id="about-title">Luiz Gois<span>.</span></h2><p class="about-role">Senior Software Engineer<br>Product Engineering · Applied AI</p><p>Acredito que negócios de qualquer tamanho podem ter uma infraestrutura inteligente que dê mais poder de decisão e autonomia a quem empreende e a quem faz a operação acontecer.</p><p>Combino engenharia, produto, dados e IA para sair do problema e chegar a uma solução em produção, com clareza sobre o que estamos buscando.</p>
+        <ol class="working-steps" id="processo"><li><span>01</span><div><h3>Entender a dor.</h3><p>Conhecer o negócio, a operação e o comportamento do cliente.</p></div></li><li><span>02</span><div><h3>Definir metas claras e realistas.</h3><p>Combinar prioridades, escopo e como avaliar o resultado.</p></div></li><li><span>03</span><div><h3>Construir uma solução sob medida.</h3><p>Implementar e colocar em produção, junto com você e seu time.</p></div></li><li><span>04</span><div><h3>Acompanhar e evoluir.</h3><p>Observar o uso, medir as mudanças e melhorar continuamente.</p></div></li></ol>
       </div>
     </section>
 
-    <section class="contact section" data-panel id="contato" aria-labelledby="contact-title"><div class="contact-copy"><span class="eyebrow">04 / Vamos olhar para seu negócio</span><h2 id="contact-title">Onde seu cliente<br><em>encontra dificuldade?</em></h2><p>Conte o que acontece no seu site, software ou atendimento. Vou analisar seu contexto e conversar com você sobre os caminhos possíveis.</p></div>
+    <section class="contact section" data-panel data-nav-theme="light" id="contato" aria-labelledby="contact-title"><div class="contact-copy"><span class="eyebrow">04 / Vamos construir o próximo resultado</span><h2 id="contact-title">Quero conhecer<br><em>o seu negócio.</em></h2><p>Conte sobre seu produto, sua operação e o que você quer mudar. Estou animado para entender seu contexto e construir com você o caminho para resultados melhores.</p></div>
       <div class="form-panel"><div class="form-heading eyebrow"><span>Conte o que você quer melhorar</span></div>
       <form id="contact-form" method="post" action="/api/lead" data-state="idle">
         <fieldset>
@@ -105,9 +104,9 @@
       </div>
     </section>
   </main>
-  <footer class="closing" id="final">
-    <div class="closing-content"><span class="eyebrow">O próximo passo é uma conversa.</span><h2>O próximo cliente<br>já está <em>a caminho.</em></h2><a class="button button-light" href="#contato" data-cta="footer">Vamos preparar o caminho</a></div>
-    <div class="closing-word" aria-hidden="true">Vamos melhorar.</div>
+  <footer class="closing" data-nav-theme="dark" id="final">
+    <div class="closing-content"><span class="eyebrow">O próximo passo é uma conversa.</span><h2>Seu próximo resultado<br>começa com <em>uma conversa.</em></h2><a class="button button-light" href="#contato" data-cta="footer">Vamos conversar</a></div>
+    <div class="closing-word" aria-hidden="true">Vamos construir.</div>
     <div class="footer-bottom"><span>Luiz Gois · Software e IA</span><nav aria-label="Redes sociais"><a href="https://www.linkedin.com/in/euluizgois/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (abre em nova aba)">LinkedIn<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a><a href="https://x.com/euluizgois" target="_blank" rel="noopener noreferrer" aria-label="X (abre em nova aba)">X<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a><a href="https://www.instagram.com/euluizgois/" target="_blank" rel="noopener noreferrer" aria-label="Instagram (abre em nova aba)">Instagram<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></nav><span>© 2026</span></div>
   </footer>
 </body>

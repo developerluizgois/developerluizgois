@@ -89,7 +89,8 @@ Container preservado: `GTM-KW3WSNGQ`, com script e fallback `noscript`.
 
 | Evento | Condição | Dados |
 | --- | --- | --- |
-| `contact_click` | CTA da abertura ou do rodapé | `placement`: hero/footer |
+| `journey_click` | CTA do hero para resultados | `placement`: hero; `destination`: resultados |
+| `contact_click` | CTA do rodapé para o formulário | `placement`: footer |
 | `contact_form_start` | Primeiro preenchimento do formulário | `form_provider`: hubspot |
 | `generate_lead` | HTTP 200 com `success: true` da API | `form_provider`: hubspot |
 
@@ -158,7 +159,7 @@ A variável **de build** `SITE_URL` pode substituir o domínio, se necessário. 
 O container **GTM-KW3WSNGQ** continua sendo o único ponto de instalação. Não adicione um segundo snippet GA4/Ads ao código da página.
 
 1. No GTM, criar a Google tag com o ID real de medição GA4 e o disparo de page_view configurado uma única vez por carregamento. Esta landing é uma página única: mudanças de hash como `#contato` não devem criar page_views artificiais por History Change.
-2. Criar triggers de Custom Event com nomes exatos `contact_click`, `contact_form_start` e `generate_lead`, associados às respectivas tags de evento GA4. Usar as variáveis de Data Layer `placement` e `form_provider` quando presentes. São parâmetros sem dados pessoais.
+2. Criar triggers de Custom Event com nomes exatos `journey_click`, `contact_click`, `contact_form_start` e `generate_lead`, associados às respectivas tags de evento GA4. Usar as variáveis de Data Layer `placement`, `destination` e `form_provider` quando presentes. São parâmetros sem dados pessoais.
 3. Marcar `generate_lead` como evento principal no GA4. Ele só ocorre após HTTP 200 e `success: true`, com confirmação do contato, negócio e associação. `form_submit`, `contact_click` e `contact_form_start` não comprovam conversão. Se a medição automática de formulários do GA4 gerar ruído, desativá-la e manter os eventos explícitos.
 4. Para Ads, escolher uma única conversão principal para o mesmo lead: importar o evento principal do GA4 OU disparar a tag de conversão Ads em `generate_lead`. Não contar as duas como conversões principais da mesma ação. Configurar Conversion Linker/Google tag conforme o caminho escolhido.
 5. Configurar consentimento de Analytics e publicidade no GTM/CMP antes de publicar essas tags. O checkbox do formulário autoriza o tratamento da solicitação, não cookies ou personalização de anúncios. Não há CMP implementada nesta entrega; a configuração de tags e consentimento pertence à próxima etapa.
@@ -170,8 +171,10 @@ Fontes oficiais: [títulos na busca](https://developers.google.com/search/docs/a
 
 ## Revisão da comunicação
 
-A landing tem cinco blocos: promessa, dores e soluções, resultados reais, apresentação com método de trabalho e formulário. A seção separada de processo foi incorporada à apresentação para encurtar a jornada. Atendimento no WhatsApp, melhorias de experiência e dashboards aparecem como soluções para problemas de engajamento, conversão e retenção, com ou sem IA.
+A landing tem cinco blocos: hero, resultados reais em mosaico, dores e soluções, apresentação com método de trabalho e formulário. A seção separada de processo foi incorporada à apresentação para encurtar a jornada. Atendimento no WhatsApp, melhorias de experiência e dashboards aparecem como soluções para problemas de engajamento, conversão e retenção, com ou sem IA.
 
-O componente de exemplos mantém cinco variações e contagem animada, identificado como ilustrativo. Os resultados atribuídos à Woke permanecem separados. O fundo do hero usa apenas gradientes e arcos CSS com uma animação de entrada finita, sem vídeo, biblioteca ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
+O hero mantém apenas título, descrição e CTA alinhados ao canto inferior esquerdo. O CTA avança para os resultados e usa journey_click, sem contar intenção de contato. A navegação é uma cápsula fixa no topo, com links textuais, seção ativa e contraste que acompanha a superfície. O componente de exemplos fica na seção de soluções e mantém cinco variações e contagem animada, identificado como ilustrativo. Os resultados atribuídos à Woke permanecem separados. O fundo do hero usa apenas gradientes e arcos CSS com uma animação de entrada finita, sem vídeo, biblioteca ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
 
 Validação desta revisão: TypeScript, 30 testes, build de produção, inspeção de título, canonical, sitemap, robots e JSON-LD; conferência visual desktop e mobile. Testes reais de HubSpot, GA4, Ads, Search Console e deploy continuam pendentes conforme os passos acima.
+
+A paleta combina branco, azul marinho, preto `#191919` e marrom `#2a1e1a`. O mosaico apresenta todos os números fornecidos sobre AI Job Hunter, conversão, engajamento e recrutamento. Seis cenários unem dor, implementação e benefício, com capacidades técnicas em contexto. A apresentação inclui quatro etapas: entender, combinar metas, construir e acompanhar.

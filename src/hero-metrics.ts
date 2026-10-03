@@ -7,7 +7,7 @@ const examples = [
 ];
 
 export function initHeroMetrics(): void {
-  const card = document.querySelector<HTMLElement>('.hero-note')!;
+  const card = document.querySelector<HTMLElement>('.impact-example')!;
   const content = card.querySelector<HTMLElement>('.metric-content')!;
   const number = card.querySelector<HTMLElement>('[data-metric-value]')!;
   const metric = card.querySelector<HTMLElement>('.hero-metric')!;
