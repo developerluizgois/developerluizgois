@@ -141,7 +141,7 @@ O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois | So
 - `robots.txt` permitindo rastreamento da landing e informando o sitemap; `/api/` fica fora do rastreamento.
 - `sitemap.xml` contendo apenas a página canônica. Não há datas de atualização fictícias nem URLs separadas para cada seção.
 - Conteúdo e metadados no HTML entregue pelo servidor, sem depender da execução de JavaScript pelo buscador. Um H1, títulos de seção, formulário com labels e retrato com dimensões e texto alternativo.
-- Fonte local com preload; CSS/JS versionados pelo Vite. O retrato continua lazy loaded. Os exemplos fictícios do componente animado usam `data-nosnippet` para não compor descrições de busca.
+- Fonte local com preload; CSS/JS versionados pelo Vite. O retrato continua lazy loaded. O componente de exemplos fictícios foi removido. O mosaico usa apenas os resultados fornecidos por Luiz; o texto final está no HTML antes da animação.
 - URLs inexistentes não usam fallback de SPA (`not_found_handling: none`), evitando páginas desconhecidas respondendo com a landing e status 200.
 
 A variável **de build** `SITE_URL` pode substituir o domínio, se necessário. Não é secret nem configuração do frontend em runtime. O padrão de produção já é `https://luizgois.com/`. `npm run dev` e builds com `--mode staging` geram `noindex, nofollow`, sem canonical/sitemap de produção. Use modo staging nas previews públicas. Não publique um build staging no domínio principal. Alterar o domínio exige rebuild.
@@ -173,8 +173,30 @@ Fontes oficiais: [títulos na busca](https://developers.google.com/search/docs/a
 
 A landing tem cinco blocos: hero, resultados reais em mosaico, dores e soluções, apresentação com método de trabalho e formulário. A seção separada de processo foi incorporada à apresentação para encurtar a jornada. Atendimento no WhatsApp, melhorias de experiência e dashboards aparecem como soluções para problemas de engajamento, conversão e retenção, com ou sem IA.
 
-O hero mantém apenas título, descrição e CTA alinhados ao canto inferior esquerdo. O CTA avança para os resultados e usa journey_click, sem contar intenção de contato. A navegação é uma cápsula fixa no topo, com links textuais, seção ativa e contraste que acompanha a superfície. O componente de exemplos fica na seção de soluções e mantém cinco variações e contagem animada, identificado como ilustrativo. Os resultados atribuídos à Woke permanecem separados. O fundo do hero usa apenas gradientes e arcos CSS com uma animação de entrada finita, sem vídeo, biblioteca ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
+O hero mantém apenas título, descrição e CTA alinhados ao canto inferior esquerdo. O CTA avança para os resultados e usa journey_click, sem contar intenção de contato. A navegação é uma cápsula fixa no topo, com links textuais, seção ativa e contraste que acompanha a superfície. Os números reais do mosaico animam uma vez quando entram na área visível, respeitando movimento reduzido. Todos os fundos são sólidos e não há componente de exemplos fictícios, vídeo ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
 
 Validação desta revisão: TypeScript, 30 testes, build de produção, inspeção de título, canonical, sitemap, robots e JSON-LD; conferência visual desktop e mobile. Testes reais de HubSpot, GA4, Ads, Search Console e deploy continuam pendentes conforme os passos acima.
 
-A paleta combina branco, azul marinho, preto `#191919` e marrom `#2a1e1a`. O mosaico apresenta todos os números fornecidos sobre AI Job Hunter, conversão, engajamento e recrutamento. Seis cenários unem dor, implementação e benefício, com capacidades técnicas em contexto. A apresentação inclui quatro etapas: entender, combinar metas, construir e acompanhar.
+A paleta combina branco, azul marinho, preto `#191919` e marrom `#2a1e1a`. O mosaico apresenta todos os números fornecidos sobre AI Job Hunter, conversão, engajamento e recrutamento. Cinco cenários seguem a jornada: conversão do site, WhatsApp, ativação e monetização, IA no produto e inteligência de cliente. A apresentação inclui quatro etapas: entender, combinar metas, construir e acompanhar.
+
+
+## Diagnóstico seguro do erro 502
+
+O 502 apresentado pelo proprietário confirma uma falha no processamento, mas não identifica a etapa nem o motivo retornado pelo HubSpot. A requisição informada é compatível com a validação local. Não foi reproduzida contra a conta real e a causa de produção **não está confirmada como resolvida**.
+
+O Worker agora emite `lead_delivery_failed` com campos estritamente controlados: `reference`, `step`, `reason` e `upstreamStatus`. A mesma referência aparece no header `X-Request-Id`. Não são registrados payload, respostas brutas, URL de chamada ao HubSpot, email, telefone, IDs de contato/negócio ou chave. A resposta pública mantém a mensagem genérica. A observabilidade de logs está habilitada no Wrangler, com logs automáticos de invocação desabilitados para evitar coleta desnecessária; nenhum deploy foi feito nesta entrega.
+
+Após o proprietário publicar esta revisão:
+
+1. Fazer uma tentativa controlada e anotar `X-Request-Id` se falhar.
+2. Nos logs do Worker, localizar o evento com a mesma `reference`. Compartilhar somente os quatro campos de diagnóstico, nunca chave ou payload.
+3. Interpretar `step`:
+   - `configuration`: falta uma variável obrigatória.
+   - `consent_schema`: verificar existência e permissão de leitura de `data_do_consentimento_pelo_site`; seu tipo precisa ser date ou datetime. HTTP 403 indica acesso negado; 404 indica propriedade não encontrada.
+   - `contact_lookup` / `contact_write`: verificar leitura/escrita de contatos e propriedades de consentimento.
+   - `deal_create`: verificar escrita de negócios, os nomes internos das propriedades, a opção interna `Site`, pipeline `default` e estágio `appointmentscheduled`.
+   - `association`: verificar permissão de associação. `association_unconfirmed` significa que não foi recebida confirmação concluída para o par criado.
+4. Em qualquer etapa, 401 indica falha de autenticação; 403, permissão; 400, parâmetros/propriedades rejeitados; 429, limite do serviço. `timeout` e `network_error` são falhas de comunicação. Corrigir a configuração identificada, sem remover validação ou declarar sucesso antecipado.
+5. Antes de reenviar, conferir se o contato ou negócio já foi criado para evitar duplicação decorrente de falha parcial.
+
+Validação local: 36 testes passaram, incluindo sucesso completo no endpoint e falhas simuladas nas cinco etapas externas, com teste de não exposição de dados. Isso valida o código e o diagnóstico; não comprova a configuração nem a disponibilidade da conta HubSpot em produção.

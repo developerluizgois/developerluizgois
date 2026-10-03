@@ -29,7 +29,10 @@ export default {
       return json({ success: true }, 200);
     } catch (error) {
       if (error instanceof PayloadError) return json({ success: false, message: 'Confira os campos e o consentimento antes de enviar.' }, error.status);
-      return json({ success: false, message: unavailable }, error instanceof HubSpotError ? (error.status === 409 ? 502 : error.status) : 502);
+      const reference = crypto.randomUUID();
+      // Allowlisted diagnostics only: never log requests, provider bodies, URLs or error messages.
+      console.error(JSON.stringify({ event: 'lead_delivery_failed', reference, step: error instanceof HubSpotError ? error.step ?? 'unknown' : 'unknown', reason: error instanceof HubSpotError ? error.reason : 'invalid_response', upstreamStatus: error instanceof HubSpotError ? error.upstreamStatus ?? null : null }));
+      return json({ success: false, message: unavailable }, error instanceof HubSpotError ? (error.status === 409 ? 502 : error.status) : 502, { 'X-Request-Id': reference });
     }
   },
 };

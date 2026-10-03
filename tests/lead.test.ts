@@ -111,3 +111,46 @@ describe('form submission and analytics', () => {
     expect(await submit(lead, () => {})).toBe(true);
   });
 });
+
+describe('safe production diagnostics', () => {
+  it.each([
+    ['/properties/', 'consent_schema', 403],
+    ['idProperty=email', 'contact_lookup', 401],
+    ['/objects/contacts', 'contact_write', 400],
+    ['/objects/deals', 'deal_create', 400],
+    ['/associations/default/', 'association', 403],
+  ])('identifies %s failures without leaking input/provider content', async (marker, step, upstreamStatus) => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const api = vi.fn<typeof fetch>(async (url, init) => {
+      const path = String(url);
+      const fail = marker === '/objects/contacts' ? path.endsWith(marker) && init?.method === 'POST' : marker === '/objects/deals' ? path.endsWith(marker) : path.includes(marker);
+      if (fail) return Response.json({ message: `private ${lead.email} ${config.HUBSPOT_SERVICE_KEY}` }, { status: upstreamStatus });
+      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
+      if (init?.method === 'GET') return new Response(null, { status: 404 });
+      if (path.endsWith('/contacts')) return Response.json({ id: '101' });
+      return Response.json({ id: '202' });
+    });
+    vi.stubGlobal('fetch', api);
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), { ...config, ASSETS: { fetch: api } });
+    expect(response.status).toBe(502);
+    const diagnostic = JSON.parse(log.mock.calls[0]![0]);
+    expect(diagnostic).toMatchObject({ event: 'lead_delivery_failed', step, reason: 'upstream_rejected', upstreamStatus });
+    expect(response.headers.get('X-Request-Id')).toBe(diagnostic.reference);
+    const output = JSON.stringify(log.mock.calls) + await response.text();
+    for (const value of [lead.email, lead.name, lead.challenge, config.HUBSPOT_SERVICE_KEY, 'private']) expect(output).not.toContain(value);
+  });
+  it('completes the public request only after contact, deal and association succeed', async () => {
+    const api = vi.fn<typeof fetch>(async (url, init) => {
+      const path = String(url);
+      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
+      if (init?.method === 'GET') return new Response(null, { status: 404 });
+      if (path.includes('/associations/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
+      return Response.json({ id: path.endsWith('/contacts') ? '101' : '202' });
+    });
+    vi.stubGlobal('fetch', api);
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://site.test' }, body: JSON.stringify({ ...lead, whatsapp: '+5548000000000' }) }), { ...config, ASSETS: { fetch: api } });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ success: true });
+    expect(api).toHaveBeenCalledTimes(5);
+  });
+});
