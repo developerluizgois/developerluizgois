@@ -1019,3 +1019,4 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .closing-word { margin-bottom: 0; overflow: hidden; padding-bottom: .08em; }
 .footer-bottom { position: relative; margin-top: 28px; padding-bottom: 64px; }
 @media (prefers-reduced-motion: reduce) { .metric-content { transition: none; } }
+.metric-content, .metric-disclosure { grid-column: 1 / -1; }
