@@ -94,7 +94,7 @@ export async function saveLead(lead: LeadPayload, config: HubSpotConfig, receive
         pipeline: config.HUBSPOT_PIPELINE_ID,
         dealstage: config.HUBSPOT_STAGE_NEW_ID,
         empresa_ou_produto: lead.companyOrProduct,
-        desafio_do_projeto: lead.challenge,
+        desafio_do_projeto: [lead.challenge, lead.challengeType && `O que deseja melhorar: ${lead.challengeType}`, lead.investmentRange && `Faixa de investimento: ${lead.investmentRange}`, ...Object.entries(lead.attribution ?? {}).map(([key, value]) => `${key}: ${value}`)].filter(Boolean).join('\n\n'),
         origem_do_lead: 'Site',
       },
     }));

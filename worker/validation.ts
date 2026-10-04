@@ -1,3 +1,4 @@
+import { challengeTypes, investmentRanges, attributionKeys, type Attribution } from '../shared/lead';
 import type { LeadPayload } from '../shared/lead';
 
 export class PayloadError extends Error {
@@ -5,7 +6,7 @@ export class PayloadError extends Error {
 }
 
 const MAX_BODY_BYTES = 16 * 1024;
-const allowed = new Set(['name', 'email', 'whatsapp', 'companyOrProduct', 'challenge', 'consent', 'websiteCheck']);
+const allowed = new Set(['name', 'email', 'whatsapp', 'companyOrProduct', 'challenge', 'consent', 'websiteCheck', 'challengeType', 'investmentRange', 'attribution']);
 
 function text(value: unknown, min: number, max: number, multiline = false): string {
   if (typeof value !== 'string' || value.length > max || /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(value)) throw new PayloadError();
@@ -35,7 +36,24 @@ export function validateLead(payload: unknown): LeadPayload {
       whatsapp = `${phone.startsWith('+') ? '+' : ''}${digits}`;
     }
   }
-  return { name, email, ...(whatsapp ? { whatsapp } : {}), companyOrProduct, challenge, consent: true };
+  const challengeType = data.challengeType === undefined ? undefined : text(data.challengeType, 1, 80);
+  const investmentRange = data.investmentRange === undefined ? undefined : text(data.investmentRange, 1, 80);
+  if (challengeType && !challengeTypes.includes(challengeType as typeof challengeTypes[number])) throw new PayloadError();
+  if (investmentRange && !investmentRanges.includes(investmentRange as typeof investmentRanges[number])) throw new PayloadError();
+  const attribution: Attribution = {};
+  if (data.attribution !== undefined) {
+    if (!data.attribution || typeof data.attribution !== 'object' || Array.isArray(data.attribution)) throw new PayloadError();
+    for (const [key, value] of Object.entries(data.attribution)) {
+      if (!attributionKeys.includes(key as typeof attributionKeys[number])) throw new PayloadError();
+      const clean = text(value, 1, 120);
+      if (key === 'referrer') {
+        let url: URL; try { url = new URL(clean); } catch { throw new PayloadError(); }
+        if (!['https:', 'http:'].includes(url.protocol) || url.origin !== clean) throw new PayloadError();
+      } else if (!/^[a-zA-Z0-9_. -]+$/.test(clean)) throw new PayloadError();
+      attribution[key as typeof attributionKeys[number]] = clean;
+    }
+  }
+  return { ...(challengeType ? { challengeType: challengeType as typeof challengeTypes[number] } : {}), ...(investmentRange ? { investmentRange: investmentRange as typeof investmentRanges[number] } : {}), ...(Object.keys(attribution).length ? { attribution } : {}), name, email, ...(whatsapp ? { whatsapp } : {}), companyOrProduct, challenge, consent: true };
 }
 
 export async function readLead(request: Request): Promise<LeadPayload> {

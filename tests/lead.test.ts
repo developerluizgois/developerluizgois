@@ -96,18 +96,18 @@ describe('form submission and analytics', () => {
     const first = submit(lead, next => states.push(next));
     expect(await submit(lead, next => states.push(next))).toBe(false);
     expect(api).toHaveBeenCalledTimes(1);
-    expect(window.dataLayer).toEqual([]);
+    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'hubspot' });
     resolve(Response.json({ success: true }));
     expect(await first).toBe(true);
     expect(states).toEqual(['submitting', 'success']);
-    expect(window.dataLayer).toEqual([{ event: 'generate_lead', form_provider: 'hubspot' }]);
+    expect(window.dataLayer).toEqual(['contact_form_submit', 'generate_lead', 'contact_form_success'].map(event => ({ event, form_provider: 'hubspot' })));
   });
   it('does not generate a lead on error/202 and permits retry', async () => {
     vi.stubGlobal('window', { dataLayer: [] });
     const api = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({ success: true }, { status: 202 })).mockResolvedValueOnce(Response.json({ success: true }));
     const submit = createSubmission(api);
     expect(await submit(lead, () => {})).toBe(false);
-    expect(window.dataLayer).toEqual([]);
+    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'hubspot' });
     expect(await submit(lead, () => {})).toBe(true);
   });
 });
@@ -152,5 +152,43 @@ describe('safe production diagnostics', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ success: true });
     expect(api).toHaveBeenCalledTimes(5);
+  });
+});
+
+
+describe('qualification and attribution', () => {
+  it('accepts every budget without rejecting lower investments', () => {
+    for (const investmentRange of ['Ainda preciso entender', 'Até R$ 10 mil', 'R$ 10 mil a R$ 25 mil', 'R$ 25 mil a R$ 50 mil', 'Acima de R$ 50 mil']) {
+      expect(validateLead({ ...lead, investmentRange }).investmentRange).toBe(investmentRange);
+    }
+  });
+  it.each([{ challengeType: 'untrusted' }, { investmentRange: 'custom' }, { attribution: { email: 'private' } }, { attribution: { utm_source: 'person@example.com' } }, { attribution: { referrer: 'https://example.com/private?email=x' } }])('rejects unsafe qualification %j', fields => {
+    expect(() => validateLead({ ...lead, ...fields })).toThrow();
+  });
+  it('preserves qualified input in the existing CRM field without new properties', async () => {
+    const qualified = validateLead({ ...lead, challengeType: 'Integrações e dados', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin', referrer: 'https://example.com' } });
+    const api = vi.fn<typeof fetch>(async (url, init) => {
+      if (String(url).includes('/properties/')) return Response.json({ type: 'datetime' });
+      if (init?.method === 'GET') return Response.json({ id: '101' });
+      if (String(url).includes('/associations/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
+      return Response.json({ id: String(url).endsWith('/deals') ? '202' : '101' });
+    });
+    await saveLead(qualified, config, receivedAt, api);
+    const deal = JSON.parse(String(api.mock.calls.find(([url]) => String(url).endsWith('/deals'))![1]?.body)).properties;
+    expect(deal.desafio_do_projeto).toContain('O que deseja melhorar: Integrações e dados');
+    expect(deal.desafio_do_projeto).toContain('Faixa de investimento: Até R$ 10 mil');
+    expect(deal.desafio_do_projeto).toContain('utm_source: linkedin');
+    expect(Object.keys(deal)).toHaveLength(6);
+  });
+  it('analytics failure cannot turn a successful submission into an error', async () => {
+    vi.stubGlobal('window', { dataLayer: { push() { throw new Error('Blocked'); } } });
+    const states: FormState[] = [];
+    expect(await createSubmission(vi.fn<typeof fetch>().mockResolvedValue(Response.json({ success: true })))(lead, next => states.push(next))).toBe(true);
+    expect(states).toEqual(['submitting', 'success']);
+  });
+  it.each([() => Promise.reject(new DOMException('Timeout', 'TimeoutError')), () => Promise.resolve(new Response('invalid json'))])('reports failed transport without converting', async fetcher => {
+    vi.stubGlobal('window', { dataLayer: [] });
+    expect(await createSubmission(vi.fn<typeof fetch>(fetcher))(lead, () => {})).toBe(false);
+    expect(window.dataLayer).toEqual(['contact_form_submit', 'contact_form_error'].map(event => ({ event, form_provider: 'hubspot' })));
   });
 });

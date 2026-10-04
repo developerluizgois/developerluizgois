@@ -30,8 +30,8 @@ export function seoPlugin(siteUrl?: string): Plugin {
           '@context': 'https://schema.org',
           '@graph': [
             { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Engenharia de software, IA aplicada e desenvolvimento de produtos digitais.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
-            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois | Software e IA', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois | Software e IA', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Software personalizado, agentes de IA e automações para melhorar engajamento, conversão e retenção.' },
+            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois | Engenharia de Produto, Software e IA Aplicada', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
+            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois | Engenharia de Produto, Software e IA Aplicada', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Engenharia de produto, software sob medida e IA aplicada para aumentar conversão, automatizar operações e integrar dados e sistemas.' },
           ],
         }).replace(/</g, '\\u003c') },
       );

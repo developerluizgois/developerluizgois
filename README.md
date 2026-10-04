@@ -109,9 +109,9 @@ O botão é bloqueado durante envio, inclusive contra submissões concorrentes. 
 - `vite.config.ts`, `wrangler.jsonc`, `tsconfig.json`, `vitest.config.ts`, `package-lock.json`: tooling/configuração.
 - Scripts artesanais anteriores e o fluxo provisório de contato foram removidos.
 
-O scroll usa `scroll-snap` nativo: seções de no mínimo uma tela e encaixe obrigatório no desktop; altura natural e aproximação no celular para permitir leitura de seções longas e preenchimento com teclado aberto. Conteúdo que ultrapassa uma tela continua acessível. `prefers-reduced-motion` desativa o encaixe e animações. Não existe captura de eventos wheel nem bloqueio de rolagem.
+O scroll usa `scroll-snap` nativo: aproximação suave no desktop e no celular, com altura natural nos blocos editoriais para permitir leitura de seções longas e preenchimento com teclado aberto. Conteúdo que ultrapassa uma tela continua acessível. `prefers-reduced-motion` desativa o encaixe e animações. Não existe captura de eventos wheel nem bloqueio de rolagem.
 
-Somente LinkedIn, X e Instagram aparecem como links externos na página, todos no rodapé. A imagem nova é preservada em sua versão original; o recorte é responsivo via CSS. A fonte Geist é servida localmente sob a licença incluída.
+LinkedIn, X e Instagram aparecem no rodapé. Os quatro cases possuem links para a plataforma de origem da experiência profissional. A imagem nova é preservada em sua versão original; o recorte é responsivo via CSS. A fonte Geist é servida localmente sob a licença incluída.
 
 ## Validação e entrega
 
@@ -133,7 +133,7 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 ## SEO e medição em produção
 
-O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois | Software e IA**. O build normal de produção gera:
+O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois | Engenharia de Produto, Software e IA Aplicada**. O build normal de produção gera:
 
 - Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card com o retrato de Luiz.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
@@ -169,17 +169,6 @@ GTM instalado não significa que GA4/Ads já estejam recebendo eventos. IDs, tag
 
 Fontes oficiais: [títulos na busca](https://developers.google.com/search/docs/appearance/title-link), [canonical](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [sitemaps](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap), [eventos GA4 no GTM](https://support.google.com/tagmanager/answer/13034206), [generate_lead](https://developers.google.com/analytics/devguides/collection/ga4/reference/events#generate_lead).
 
-## Revisão da comunicação
-
-A landing tem cinco blocos: hero, resultados reais em mosaico, dores e soluções, apresentação com método de trabalho e formulário. A seção separada de processo foi incorporada à apresentação para encurtar a jornada. Atendimento no WhatsApp, melhorias de experiência e dashboards aparecem como soluções para problemas de engajamento, conversão e retenção, com ou sem IA.
-
-O hero mantém apenas título, descrição e CTA alinhados ao canto inferior esquerdo. O CTA avança para os resultados e usa journey_click, sem contar intenção de contato. A navegação é uma cápsula fixa no topo, com links textuais, seção ativa e contraste que acompanha a superfície. Os números reais do mosaico animam uma vez quando entram na área visível, respeitando movimento reduzido. Todos os fundos são sólidos e não há componente de exemplos fictícios, vídeo ou dependência nova. O CSS antigo foi substituído para remover regras e componentes que não fazem mais parte do layout.
-
-Validação desta revisão: TypeScript, 30 testes, build de produção, inspeção de título, canonical, sitemap, robots e JSON-LD; conferência visual desktop e mobile. Testes reais de HubSpot, GA4, Ads, Search Console e deploy continuam pendentes conforme os passos acima.
-
-A paleta combina branco, azul marinho, preto `#191919` e marrom `#2a1e1a`. O mosaico apresenta todos os números fornecidos sobre AI Job Hunter, conversão, engajamento e recrutamento. Cinco cenários seguem a jornada: conversão do site, WhatsApp, ativação e monetização, IA no produto e inteligência de cliente. A apresentação inclui quatro etapas: entender, combinar metas, construir e acompanhar.
-
-
 ## Diagnóstico seguro do erro 502
 
 O 502 apresentado pelo proprietário confirma uma falha no processamento, mas não identifica a etapa nem o motivo retornado pelo HubSpot. A requisição informada é compatível com a validação local. Não foi reproduzida contra a conta real e a causa de produção **não está confirmada como resolvida**.
@@ -200,3 +189,30 @@ Após o proprietário publicar esta revisão:
 5. Antes de reenviar, conferir se o contato ou negócio já foi criado para evitar duplicação decorrente de falha parcial.
 
 Validação local: 36 testes passaram, incluindo sucesso completo no endpoint e falhas simuladas nas cinco etapas externas, com teste de não exposição de dados. Isso valida o código e o diagnóstico; não comprova a configuração nem a disponibilidade da conta HubSpot em produção.
+
+
+## Reposicionamento B2B (3 de outubro de 2026)
+
+A página continua única, com a arquitetura Vite/TypeScript/Worker existente. Não foram criados roteamento, scaffolding ou páginas futuras. Hero e conteúdo apresentam Engenharia de Produto, Software e IA Aplicada para empresas em operação. O catálogo foi reduzido a quatro frentes; tecnologia aparece como capacidade secundária. Foram adicionados qualificação, exemplos, método, contratação e FAQ nativo acessível.
+
+Removidos os três números sem comprovação: WhatsApp +20 vendas, landing page +50% e retenção de 20 clientes. Os cases restantes usam apenas o histórico fornecido, com atribuição cuidadosa da conversão. Nenhum depoimento ou endosso foi acrescentado.
+
+### Formulário e compatibilidade
+
+`challengeType` e `investmentRange` são opcionais, validados por listas fechadas no Worker. Todas as faixas, inclusive até R$ 10 mil, são aceitas. Clientes antigos que não enviam esses campos continuam aceitos. A qualificação é anexada ao campo existente `desafio_do_projeto` do Deal; não exige criar propriedades novas no HubSpot. O fluxo Contact → Deal → associação, consentimento, origem, honeypot, limite de corpo e chave no backend foram preservados.
+
+UTMs são capturadas da URL de entrada enquanto a página está aberta. Aceitam apenas slugs de campanha de até 120 caracteres (letras sem acento, números, espaço, ponto, hífen e sublinhado). O referrer é reduzido à origem, sem caminho ou query. Não há persistência entre visitas, cookies novos ou envio desses valores aos eventos personalizados de analytics. Configure campanhas sem dados pessoais; parâmetros fora desse formato são descartados. Informações aceitas seguem somente ao CRM, na descrição do Deal.
+
+### Eventos
+
+Preservados `contact_click`, `journey_click`, `contact_form_start` e `generate_lead`.
+Novos: `hero_primary_cta_click`, `hero_results_cta_click`, `solution_view`, `case_view`, `contact_form_submit`, `contact_form_success`, `contact_form_error`, `linkedin_click`.
+Visualizações usam somente `content_id` estático e disparam uma vez por carregamento. Eventos do formulário usam `form_provider`. Não são enviados nome, email, telefone, desafio, URL, referrer ou UTMs. `generate_lead` continua sendo a única conversão recomendada; não marque também `contact_form_success` como conversão da mesma ação. Falhas no dataLayer são isoladas do envio. Não existe link de WhatsApp e, portanto, não há disparo fictício de `whatsapp_click`.
+
+GTM-KW3WSNGQ preservado. Criar os triggers desejados no GTM e validar GA4/Ads após publicação pelo proprietário. Não houve alteração externa de tags, credenciais, CRM ou deploy.
+
+### Validação desta entrega
+
+Baseline: TypeScript, 36 testes e build passaram. Após alterações: TypeScript, 48 testes (incluindo qualificação, atribuição, timeout, JSON inválido e analytics indisponível) e build passaram. Não existe script de lint. Verificação de SEO e âncoras é feita sobre o HTML de produção. Nenhuma pontuação Lighthouse foi medida.
+
+Validação manual final: publicar após revisão; enviar o formulário com cada faixa de investimento, conferir qualificação/origem no Deal e associação com Contact; validar sucesso, erro/reenvio, teclado móvel, notificação e confete; conferir eventos pelo Tag Assistant e GA4. A causa do 502 anterior não está confirmada como resolvida. As instruções de diagnóstico acima permanecem aplicáveis. A foto original permanece lazy loaded; não houve nova biblioteca.
