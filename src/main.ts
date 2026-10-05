@@ -41,6 +41,24 @@ window.addEventListener('resize', scheduleNavigation);
 new ResizeObserver(scheduleNavigation).observe(document.querySelector('main')!);
 updateNavigation();
 
+// Keep the reading flow continuous and reveal editorial blocks as they enter the viewport.
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!prefersReducedMotion) {
+  document.documentElement.classList.add('motion-ready');
+  const revealTargets = [...document.querySelectorAll<HTMLElement>('.section-heading, .section-intro, .proof-mosaic, .fronts, .fit-grid, .example-grid, .method-grid, .method-note, .portrait, .about-copy, .faq, .contact-copy, .form-panel, .closing-content')];
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: .12, rootMargin: '0px 0px -8% 0px' });
+  revealTargets.forEach(target => {
+    target.dataset.reveal = '';
+    revealObserver.observe(target);
+  });
+}
+
 // Observe each case/front once; identifiers are static, never form values.
 const seen = new IntersectionObserver(entries => {
   entries.forEach(entry => {
