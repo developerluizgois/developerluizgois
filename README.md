@@ -216,3 +216,10 @@ GTM-KW3WSNGQ preservado. Criar os triggers desejados no GTM e validar GA4/Ads ap
 Baseline: TypeScript, 36 testes e build passaram. Após alterações: TypeScript, 48 testes (incluindo qualificação, atribuição, timeout, JSON inválido e analytics indisponível) e build passaram. Não existe script de lint. Verificação de SEO e âncoras é feita sobre o HTML de produção. Nenhuma pontuação Lighthouse foi medida.
 
 Validação manual final: publicar após revisão; enviar o formulário com cada faixa de investimento, conferir qualificação/origem no Deal e associação com Contact; validar sucesso, erro/reenvio, teclado móvel, notificação e confete; conferir eventos pelo Tag Assistant e GA4. A causa do 502 anterior não está confirmada como resolvida. As instruções de diagnóstico acima permanecem aplicáveis. A foto original permanece lazy loaded; não houve nova biblioteca.
+
+
+## Ajustes editoriais e de rolagem — 4 de outubro de 2026
+
+Removidos os textos acima dos títulos das seções, os complementos do hero, a faixa de prova repetida e o modelo de contratação. Títulos, método e apresentação pessoal seguem a nova redação. FAQ informa investimento médio em torno de R$ 8 mil, condicionado ao diagnóstico e escopo. Experiência técnica ampliada sem copiar avaliações ou recomendações do LinkedIn.
+
+Rolagem: capítulos de pelo menos uma viewport no desktop com encaixe nativo obrigatório; seções maiores continuam com leitura interna natural. Em telas pequenas ou baixas, aproximação suave e altura livre. Movimento reduzido desativa o encaixe. Não há captura de wheel, biblioteca de scroll ou alteração do formulário.

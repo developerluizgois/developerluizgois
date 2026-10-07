@@ -383,3 +383,16 @@ select:focus-visible { outline: 2px solid #648bc9; outline-offset: 3px; }
 .field-error { display: block; color: #922b29; font-size: 12px; line-height: 1.5; margin-top: 6px; }
 .consent { flex-wrap: wrap; }
 .consent .field-error { flex-basis: 100%; }
+
+/* Full-height chapters with native snapping; long chapters remain freely readable. */
+html { scroll-snap-type: y mandatory; }
+[data-panel] { min-height: 100svh; scroll-snap-align: start; scroll-snap-stop: normal; }
+.editorial { justify-content: center; }
+.hero h1 { margin-top: 0; }
+@media (max-width: 700px), (max-height: 600px) {
+ html { scroll-snap-type: y proximity; }
+ .section { min-height: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior: auto; scroll-snap-type: none; }
+}
