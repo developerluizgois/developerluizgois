@@ -23,15 +23,15 @@ export function seoPlugin(siteUrl?: string): Plugin {
         { tag: 'link', attrs: { rel: 'canonical', href: url }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:url', content: url }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image', content: image }, injectTo: 'head' },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Retrato de Luiz Gois, Senior Software Engineer' }, injectTo: 'head' },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Retrato de Luiz Gois, engenheiro de produto e growth' }, injectTo: 'head' },
         { tag: 'meta', attrs: { name: 'twitter:image', content: image }, injectTo: 'head' },
         { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Retrato de Luiz Gois' }, injectTo: 'head' },
         { tag: 'script', attrs: { type: 'application/ld+json' }, injectTo: 'head', children: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [
-            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Senior Software Engineer há mais de 6 anos trabalhando com produto e engenharia, resolvendo desafios de conversão e engajamento.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
-            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Desenho, implemento e acompanho a experiência de consumo e relacionamento do seu software, combinando engenharia, dados e IA para conduzir, monetizar e fidelizar seus clientes.' },
+            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Engenheiro de produto e growth', description: 'Engenheiro de produto e growth há mais de 6 anos, construindo ativação, conversão e retenção para empresas de software.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
+            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois — Engenharia de produto e growth para software', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
+            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois — Engenharia de produto e growth para software', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Encontro onde seu software perde usuários, do cadastro à renovação, e construo as melhorias com seu time: engenharia, dados e IA para ativar, converter e reter.' },
           ],
         }).replace(/</g, '\\u003c') },
       );

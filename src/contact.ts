@@ -77,7 +77,7 @@ export function initContactForm(): void {
     if (next === 'error') status.focus({ preventScroll: true });
     if (next === 'success') {
       const viaWhatsapp = preferWhatsapp.checked;
-      success.querySelector('[data-success-copy]')!.textContent = `Vou ler seu contexto e responder por ${viaWhatsapp ? 'WhatsApp' : 'email'} com o próximo passo.`;
+      success.querySelector('[data-success-copy]')!.textContent = `Vou ler seu contexto e responder por ${viaWhatsapp ? 'WhatsApp' : 'email'} em até 1 dia útil com o próximo passo.`;
       form.reset();
       syncWhatsapp();
       started = false;

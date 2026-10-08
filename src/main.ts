@@ -45,6 +45,9 @@ document.querySelectorAll<HTMLAnchorElement>('[data-social]').forEach(link => {
   const placement = link.closest('#form-success') ? 'form_success' : link.closest('.person') ? 'team' : 'footer';
   link.addEventListener('click', () => trackSocialClick(link.dataset.social!, placement));
 });
+document.querySelectorAll<HTMLDetailsElement>('[data-faq]').forEach(item => {
+  item.addEventListener('toggle', () => { if (item.open) trackEvent('faq_open', { content_id: item.dataset.faq! }); });
+});
 document.querySelectorAll<HTMLAnchorElement>('a[href="#privacidade"]').forEach(link => {
   link.addEventListener('click', () => { document.querySelector<HTMLDetailsElement>('#privacidade')!.open = true; });
 });
