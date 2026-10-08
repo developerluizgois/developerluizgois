@@ -195,8 +195,14 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .panel-ai { background: var(--paper-2); color: var(--ink); --c-line: #b8c2d0; --c-strong: var(--ink); --c-accent: var(--navy-500); --c-text: var(--ink); --c-muted: var(--muted); --c-soft: var(--white); --c-on-accent: var(--white); }
 .panel-ai .mv-accent[opacity] { fill: var(--accent); }
 .panel-auto { background: var(--accent); color: var(--ink); --c-line: var(--navy-400); --c-strong: var(--ink); --c-accent: var(--navy-700); --c-text: var(--ink); --c-muted: var(--navy-700); --c-soft: var(--paper); --c-on-accent: var(--paper); }
-.mv-bubble { fill: var(--white); stroke: var(--c-line); stroke-width: 1.2; }
-.mv-check { fill: none; stroke: var(--c-on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wa-in { fill: var(--white); }
+.wa-out { fill: var(--paper-2); }
+.panel-visual .wa-text { fill: var(--ink); font-size: 13px; }
+.panel-visual .wa-time { fill: var(--muted); font-size: 10px; }
+.wa-tick { fill: none; stroke: #b8c2d0; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.wa-tick.wa-read { stroke: var(--navy-500); }
+.wa-dot { fill: var(--muted); }
+.panel-chat { max-height: 300px; }
 .panel-visual .mv-on-accent { font-size: 13px; }
 .panel-visual circle.mv-on-accent { fill: var(--c-on-accent); }
 .panel-visual text, .scene text { font-family: var(--sans); }
@@ -401,7 +407,7 @@ form .button { width: 100%; margin-top: 28px; }
   .scene .mv-muted { font-size: 19px; }
   .panel-visual .mv-text, .panel-visual .mv-on-accent { font-size: 15px; }
   .panel-visual .mv-muted { font-size: 14px; }
-  .panel-auto .panel-visual .mv-text, .panel-auto .panel-visual .mv-on-accent, .panel-auto .panel-visual .mv-muted { font-size: 13px; }
+
 
   .person-photo { max-height: none; min-height: 0; }
   .footer-statement { font-size: clamp(48px, 15vw, 72px); }
