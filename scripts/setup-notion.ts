@@ -6,7 +6,7 @@ import { challengeTypes, investmentRanges } from '../shared/lead.ts';
 const NOTION_VERSION = '2026-03-11';
 const token = process.env.NOTION_TOKEN?.trim();
 const parent = process.env.NOTION_PARENT_PAGE?.trim();
-const ownerEmail = (process.env.NOTION_OWNER_EMAIL ?? 'developer@luizgois.com').trim().toLowerCase();
+const ownerEmail = (process.env.NOTION_OWNER_EMAIL ?? 'luizgois.contact@gmail.com').trim().toLowerCase();
 
 if (!token || !parent) {
   console.error('Defina NOTION_TOKEN e NOTION_PARENT_PAGE (o link ou o id da página compartilhada com a integração).');

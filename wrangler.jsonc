@@ -16,6 +16,6 @@
   // These two IDs come from `npm run setup:notion` and are not secret.
   "vars": {
     "NOTION_DATA_SOURCE_ID": "5e5f00c2-c99f-44c0-ad37-138453f514dc",
-    "NOTION_OWNER_ID": ""
+    "NOTION_OWNER_ID": "242d872b-594c-8149-981d-0002b8fcedcb"
   }
 }
