@@ -1,12 +1,12 @@
 import { trackEvent } from './analytics';
 
 const metrics = [
-  { id: 'receita-saas-vendas', label: 'Receita · SaaS de vendas', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
-  { id: 'conversao-plataforma-carreira', label: 'Conversão · plataforma de carreira', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
-  { id: 'engajamento-plataforma-carreira', label: 'Engajamento · plataforma de carreira', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
-  { id: 'compras-ecommerce', label: 'Compras · e-commerce', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
-  { id: 'ia-plataforma-recrutamento', label: 'IA · plataforma de recrutamento', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
-  { id: 'abandono-ecommerce', label: 'Abandono · e-commerce', value: '−12%', aux: 'de carrinhos abandonados' },
+  { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
+  { id: 'conversao', label: 'Conversão', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
+  { id: 'engajamento', label: 'Engajamento', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
+  { id: 'relacionamento', label: 'Relacionamento', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
+  { id: 'ia', label: 'Inteligência artificial', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
+  { id: 'checkout', label: 'Checkout', value: '−12%', aux: 'de carrinhos abandonados' },
 ] as const;
 const INTERVAL = 4800;
 
