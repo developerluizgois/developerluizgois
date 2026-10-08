@@ -92,7 +92,7 @@ export function initContactForm(): void {
     }
   }
 
-  form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]):not([name="websiteCheck"]):not([name="preferWhatsapp"]), textarea').forEach(field => {
+  form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input:not([type="hidden"]):not([name="websiteCheck"]):not([name="preferWhatsapp"]), textarea, select').forEach(field => {
     const errorId = `error-${field.name}`;
     const helpId = field.name === 'challenge' ? 'challenge-help' : '';
     const clearError = () => {
@@ -108,9 +108,9 @@ export function initContactForm(): void {
       message.id = errorId;
       message.className = 'field-error';
       message.textContent = field.validity.valueMissing
-        ? (field.type === 'checkbox' ? 'Aceite o uso dos dados para continuar.' : 'Preencha este campo.')
+        ? (field.type === 'checkbox' ? 'Aceite o uso dos dados para continuar.' : field instanceof HTMLSelectElement ? 'Escolha uma opção.' : 'Preencha este campo.')
         : field.validity.typeMismatch ? 'Informe um email válido.'
-        : field.validity.tooShort ? `Use pelo menos ${field.minLength} caracteres.`
+        : !(field instanceof HTMLSelectElement) && field.validity.tooShort ? `Use pelo menos ${field.minLength} caracteres.`
         : 'Confira o valor informado.';
       field.closest('label')!.append(message);
       status.dataset.state = 'error';
@@ -136,6 +136,8 @@ export function initContactForm(): void {
       email: String(values.get('email') ?? '').trim(),
       ...(wantsWhatsapp ? { whatsapp: String(values.get('whatsapp') ?? '').trim(), contactPreference: 'whatsapp' as const } : {}),
       companyOrProduct: String(values.get('companyOrProduct') ?? '').trim(),
+      challengeType: String(values.get('challengeType') ?? '') as LeadPayload['challengeType'],
+      investmentRange: String(values.get('investmentRange') ?? '') as LeadPayload['investmentRange'],
       challenge: String(values.get('challenge') ?? '').trim(),
       consent: true,
       websiteCheck: String(values.get('websiteCheck') ?? ''),

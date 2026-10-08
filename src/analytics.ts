@@ -18,8 +18,8 @@ const legacyFormEvents = {
 export type FormEvent = keyof typeof legacyFormEvents;
 
 export function trackForm(event: FormEvent): void {
-  trackEvent(event, { form_provider: 'hubspot' });
-  legacyFormEvents[event].forEach(legacy => trackEvent(legacy, { form_provider: 'hubspot' }));
+  trackEvent(event, { form_provider: 'notion' });
+  legacyFormEvents[event].forEach(legacy => trackEvent(legacy, { form_provider: 'notion' }));
 }
 
 export function trackContactClick(placement: 'hero' | 'process' | 'service', service?: string): void {

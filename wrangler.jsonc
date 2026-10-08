@@ -12,8 +12,10 @@
     "enabled": true,
     "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": false }
   },
+  // Secrets NOTION_TOKEN and ANTHROPIC_API_KEY are set with `wrangler secret put`, never here.
+  // These two IDs come from `npm run setup:notion` and are not secret.
   "vars": {
-    "HUBSPOT_PIPELINE_ID": "default",
-    "HUBSPOT_STAGE_NEW_ID": "appointmentscheduled"
+    "NOTION_DATA_SOURCE_ID": "",
+    "NOTION_OWNER_ID": ""
   }
 }

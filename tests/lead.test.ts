@@ -1,12 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { validateLead } from '../worker/validation';
-import { saveLead, consentTimestamp } from '../worker/hubspot';
-import worker from '../worker/index';
+import { readFileSync } from 'node:fs';
+import { createLeadPage, richText, NOTION_VERSION } from '../worker/notion';
+import { assessLead } from '../worker/assessment';
+import { finalScore, provisionalScore, tierFor } from '../worker/scoring';
+import worker, { enrichLead } from '../worker/index';
+import { challengeTypes, investmentRanges } from '../shared/lead';
 import { createSubmission } from '../src/contact';
 import type { FormState } from '../src/contact';
 
 const lead = { name: 'Maria Teste', email: 'maria@example.com', companyOrProduct: 'Produto teste', challenge: 'Quero melhorar a conversão do produto.', consent: true as const };
-const config = { HUBSPOT_SERVICE_KEY: 'unit-test-only', HUBSPOT_PIPELINE_ID: 'default', HUBSPOT_STAGE_NEW_ID: 'appointmentscheduled' };
+const config = { NOTION_TOKEN: 'unit-test-only', NOTION_DATA_SOURCE_ID: 'source-1', NOTION_OWNER_ID: 'owner-1' };
+const env = { ...config, ASSETS: { fetch: async () => new Response('asset') } };
 const receivedAt = new Date('2026-10-02T15:22:33.444Z');
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
@@ -27,56 +32,119 @@ describe('server validation', () => {
   });
 });
 
-describe('HubSpot mapping without external calls', () => {
-  function fakeApi(existing: boolean) {
-    return vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
-      const path = String(url);
-      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
-      if (init?.method === 'GET') return existing ? Response.json({ id: '101' }) : new Response(null, { status: 404 });
-      if (path.includes('/associations/default/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
-      if (path.endsWith('/contacts') || path.endsWith('/contacts/101')) return Response.json({ id: '101' });
-      if (path.endsWith('/deals')) return Response.json({ id: '202' });
-      throw new Error('Unexpected endpoint');
+// Fake Notion + Anthropic APIs: records every call, never leaves the process.
+function fakeApis(options: { notion?: number; anthropic?: number; assessment?: Record<string, unknown> } = {}) {
+  const assessment = options.assessment ?? { fit: 26, urgency: 17, clarity: 12, reason: 'SaaS com churn subindo e dados.', first_question: 'Qual é o churn mensal hoje?' };
+  return vi.fn<typeof fetch>(async input => {
+    const url = input instanceof Request ? input.url : String(input);
+    if (url.startsWith('https://api.notion.com/')) {
+      if (options.notion && options.notion !== 200) return Response.json({ message: `private ${lead.email}` }, { status: options.notion });
+      return Response.json({ object: 'page', id: 'page-1' });
+    }
+    if (url.startsWith('https://api.anthropic.com/')) {
+      if (options.anthropic && options.anthropic !== 200) return Response.json({ type: 'error', error: { type: 'api_error', message: 'private' } }, { status: options.anthropic });
+      return Response.json({ id: 'msg_1', type: 'message', role: 'assistant', model: 'claude-haiku-5-5', content: [{ type: 'text', text: JSON.stringify(assessment) }], stop_reason: 'end_turn', stop_sequence: null, usage: { input_tokens: 1, output_tokens: 1 } });
+    }
+    throw new Error(`Unexpected endpoint ${url}`);
+  });
+}
+const notionBodies = (api: ReturnType<typeof fakeApis>) => api.mock.calls
+  .filter(([input]) => String(input instanceof Request ? input.url : input).startsWith('https://api.notion.com/'))
+  .map(([input, init]) => ({ url: String(input), method: init?.method, body: JSON.parse(String(init?.body)) }));
+
+describe('lead scoring', () => {
+  it('weights the visitor budget and the rule signals into a provisional score', () => {
+    const strong = { ...lead, email: 'ana@acme.com', companyOrProduct: 'acme.com', challengeType: 'Retenção e churn' as const, investmentRange: 'Acima de R$ 50 mil' as const, challenge: 'x'.repeat(320) };
+    const weak = { ...lead, email: 'ana@gmail.com', investmentRange: 'Até R$ 10 mil' as const };
+    expect(provisionalScore(strong)).toBe(35 + 25 + 10 + 11);
+    expect(tierFor(provisionalScore(strong))).toBe('A');
+    expect(provisionalScore(weak)).toBe(8 + 5 + 10 + 5);
+    expect(tierFor(provisionalScore(weak))).toBe('C');
+  });
+  it('clamps model scores so a bad answer cannot exceed each weight', () => {
+    const qualified = { ...lead, investmentRange: 'R$ 25 mil a R$ 50 mil' as const };
+    expect(finalScore(qualified, { fit: 99, urgency: 99, clarity: 99, reason: '', firstQuestion: '' })).toBe(32 + 30 + 20 + 15);
+    expect(finalScore(qualified, { fit: -5, urgency: Number.NaN, clarity: 3, reason: '', firstQuestion: '' })).toBe(32 + 0 + 0 + 3);
+    expect([tierFor(70), tierFor(69), tierFor(45), tierFor(44)]).toEqual(['A', 'B', 'B', 'C']);
+  });
+});
+
+describe('Notion records without external calls', () => {
+  it('creates the lead with every field, owner and provisional class', async () => {
+    const api = fakeApis();
+    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Integrações e dados', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
+    expect(await createLeadPage(qualified, 72, config, receivedAt, api)).toBe('page-1');
+    const [call] = notionBodies(api);
+    expect(call!.url).toBe('https://api.notion.com/v1/pages');
+    expect(api.mock.calls[0]![1]?.headers).toMatchObject({ 'Notion-Version': NOTION_VERSION, Authorization: 'Bearer unit-test-only' });
+    expect(call!.body.parent).toEqual({ type: 'data_source_id', data_source_id: 'source-1' });
+    const props = call!.body.properties;
+    expect(props).toMatchObject({
+      Nome: { title: [{ type: 'text', text: { content: lead.name } }] },
+      Classe: { select: { name: 'A' } }, Nota: { number: 72 }, Status: { status: { name: 'Novo' } },
+      Responsável: { people: [{ object: 'user', id: 'owner-1' }] },
+      Email: { email: lead.email }, WhatsApp: { phone_number: '+5548999999999' }, 'Responder por': { select: { name: 'WhatsApp' } },
+      'Tipo de desafio': { select: { name: 'Integrações e dados' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
+      Análise: { select: { name: 'Pendente' } }, Origem: { rich_text: [{ type: 'text', text: { content: 'utm_source: linkedin' } }] },
+      Consentimento: { checkbox: true }, 'Recebido em': { date: { start: receivedAt.toISOString() } },
     });
-  }
-  it.each([true, false])('updates/creates contact and creates a new associated deal (existing=%s)', async existing => {
-    const api = fakeApi(existing);
-    await saveLead(lead, config, receivedAt, api);
-    const contactWrite = api.mock.calls.find(([url, init]) => String(url).includes('/contacts') && ['POST', 'PATCH'].includes(init?.method || ''))!;
-    const props = JSON.parse(String(contactWrite[1]?.body)).properties;
-    expect(contactWrite[1]?.method).toBe(existing ? 'PATCH' : 'POST');
-    expect(props).toEqual({ firstname: lead.name, email: lead.email, consentimento_pelo_site: 'true', data_do_consentimento_pelo_site: receivedAt.toISOString() });
-    expect(props).not.toHaveProperty('mobilephone');
-    const dealWrite = api.mock.calls.find(([url]) => String(url).endsWith('/deals'))!;
-    expect(JSON.parse(String(dealWrite[1]?.body)).properties).toEqual({ dealname: 'Site | Produto teste | Maria Teste', pipeline: 'default', dealstage: 'appointmentscheduled', empresa_ou_produto: lead.companyOrProduct, desafio_do_projeto: lead.challenge, origem_do_lead: 'Site' });
-    expect(api.mock.calls.at(-1)?.[0]).toBe('https://api.hubapi.com/crm/v4/objects/deals/202/associations/default/contacts/101');
+    expect(call!.body.children[0].paragraph.rich_text[0]).toEqual({ type: 'mention', mention: { type: 'user', user: { object: 'user', id: 'owner-1' } } });
   });
-  it('sends phone only when provided and formats the actual property type', async () => {
-    const api = fakeApi(true);
-    await saveLead({ ...lead, whatsapp: '+5548999999999' }, config, receivedAt, api);
-    const patch = api.mock.calls.find(([, init]) => init?.method === 'PATCH')!;
-    expect(JSON.parse(String(patch[1]?.body)).properties.mobilephone).toBe('+5548999999999');
-    expect(consentTimestamp('datetime', receivedAt)).toBe('2026-10-02T15:22:33.444Z');
-    expect(consentTimestamp('date', receivedAt)).toBe('2026-10-02');
-    expect(() => consentTimestamp('string', receivedAt)).toThrow();
+  it('splits long descriptions into 2,000-character pieces without cutting text', () => {
+    const parts = richText('a'.repeat(4500));
+    expect(parts.map(part => part.text.content.length)).toEqual([2000, 2000, 500]);
   });
-  it('records the WhatsApp reply preference on the deal', async () => {
-    const api = fakeApi(false);
-    await saveLead({ ...lead, whatsapp: '+5548999999999', contactPreference: 'whatsapp' }, config, receivedAt, api);
-    const dealWrite = api.mock.calls.find(([url]) => String(url).endsWith('/deals'))!;
-    expect(JSON.parse(String(dealWrite[1]?.body)).properties.desafio_do_projeto).toBe(`${lead.challenge}\n\nPreferência de resposta: WhatsApp`);
+  it('omits optional fields and the mention when they are absent', async () => {
+    const api = fakeApis();
+    await createLeadPage(lead, 30, { ...config, NOTION_OWNER_ID: '' }, receivedAt, api);
+    const { body } = notionBodies(api)[0]!;
+    expect(body.properties).not.toHaveProperty('WhatsApp');
+    expect(body.properties).not.toHaveProperty('Origem');
+    expect(body.properties.Responsável).toEqual({ people: [] });
+    expect(body).not.toHaveProperty('children');
   });
-  it('does not confirm success for provider errors or unfinished associations', async () => {
-    await expect(saveLead(lead, config, receivedAt, vi.fn<typeof fetch>().mockResolvedValue(new Response('private provider detail', { status: 500 })))).rejects.toThrow('Lead processing unavailable');
-    const api = fakeApi(true);
-    const original = api.getMockImplementation()!;
-    api.mockImplementation(async (url, init) => String(url).includes('/associations/default/') ? Response.json({ status: 'PENDING', results: [] }) : original(url, init));
-    await expect(saveLead(lead, config, receivedAt, api)).rejects.toThrow();
+  it('rejects without configuration and maps provider errors', async () => {
+    await expect(createLeadPage(lead, 50, { ...config, NOTION_TOKEN: '' }, receivedAt, fakeApis())).rejects.toMatchObject({ status: 503, step: 'configuration' });
+    await expect(createLeadPage(lead, 50, config, receivedAt, fakeApis({ notion: 400 }))).rejects.toMatchObject({ status: 502, step: 'page_create', upstreamStatus: 400 });
+    await expect(createLeadPage(lead, 50, config, receivedAt, fakeApis({ notion: 429 }))).rejects.toMatchObject({ status: 503 });
+  });
+});
+
+describe('AI assessment', () => {
+  it('sends only the business context to the model and returns capped text', async () => {
+    const api = fakeApis({ assessment: { fit: 20, urgency: 10, clarity: 9, reason: 'r'.repeat(500), first_question: 'Qual é o churn?' } });
+    const result = await assessLead({ ...lead, whatsapp: '+5548999999999', challengeType: 'Retenção e churn' }, 'unit-test-key', api);
+    expect(result).toMatchObject({ fit: 20, urgency: 10, clarity: 9, firstQuestion: 'Qual é o churn?' });
+    expect(result.reason).toHaveLength(300);
+    const request = api.mock.calls.find(([input]) => String(input instanceof Request ? input.url : input).startsWith('https://api.anthropic.com/'))!;
+    const body = JSON.parse(String(request[1]?.body));
+    expect(body.model).toBe('claude-haiku-5-5');
+    const sent = JSON.stringify(body.messages);
+    expect(sent).toContain('example.com');
+    expect(sent).toContain(lead.challenge);
+    for (const value of [lead.name, lead.email, '+5548999999999']) expect(sent).not.toContain(value);
+  });
+  it('fails without a key instead of calling the API', async () => {
+    const api = fakeApis();
+    await expect(assessLead(lead, undefined, api)).rejects.toThrow();
+    expect(api).not.toHaveBeenCalled();
+  });
+  it('records the final score, or marks the lead when the model is unavailable', async () => {
+    const ok = fakeApis();
+    await enrichLead({ ...lead, investmentRange: 'R$ 25 mil a R$ 50 mil' }, 'page-1', { ...env, ANTHROPIC_API_KEY: 'unit-test-key' }, ok);
+    const update = notionBodies(ok).at(-1)!;
+    expect(update).toMatchObject({ url: 'https://api.notion.com/v1/pages/page-1', method: 'PATCH' });
+    expect(update.body.properties).toMatchObject({ Nota: { number: 32 + 26 + 17 + 12 }, Classe: { select: { name: 'A' } }, Análise: { select: { name: 'Com IA' } }, 'Primeira pergunta': { rich_text: [{ type: 'text', text: { content: 'Qual é o churn mensal hoje?' } }] } });
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const down = fakeApis({ anthropic: 400 });
+    await enrichLead(lead, 'page-1', { ...env, ANTHROPIC_API_KEY: 'unit-test-key' }, down);
+    expect(notionBodies(down).at(-1)!.body.properties).toEqual({ Análise: { select: { name: 'Sem IA' } } });
+    const output = JSON.stringify(log.mock.calls);
+    for (const value of [lead.email, lead.name, lead.challenge, 'private']) expect(output).not.toContain(value);
   });
 });
 
 describe('public endpoint', () => {
-  const env = { ...config, ASSETS: { fetch: vi.fn(async () => new Response('asset')) } };
   it.each([
     ['GET', {}, undefined, 405],
     ['POST', { 'Content-Type': 'text/plain' }, '{}', 415],
@@ -91,9 +159,21 @@ describe('public endpoint', () => {
     expect(api).not.toHaveBeenCalled();
   });
   it('fails safely without secrets and never exposes internals', async () => {
-    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), { ...env, HUBSPOT_SERVICE_KEY: '' });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), { ...env, NOTION_TOKEN: '' });
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ success: false, message: 'Não foi possível enviar sua solicitação. Tente novamente.' });
+  });
+  it('confirms once the lead is saved and leaves the AI step to waitUntil', async () => {
+    const api = fakeApis();
+    vi.stubGlobal('fetch', api);
+    const pending: Promise<unknown>[] = [];
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://site.test' }, body: JSON.stringify(lead) }), { ...env, ANTHROPIC_API_KEY: 'unit-test-key' }, { waitUntil: promise => { pending.push(promise); } });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ success: true });
+    expect(pending).toHaveLength(1);
+    await Promise.all(pending);
+    expect(notionBodies(api).map(call => call.method)).toEqual(['POST', 'PATCH']);
   });
 });
 
@@ -107,11 +187,11 @@ describe('form submission and analytics', () => {
     const first = submit(lead, next => states.push(next));
     expect(await submit(lead, next => states.push(next))).toBe(false);
     expect(api).toHaveBeenCalledTimes(1);
-    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'hubspot' });
+    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'notion' });
     resolve(Response.json({ success: true }));
     expect(await first).toBe(true);
     expect(states).toEqual(['submitting', 'success']);
-    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_success', 'generate_lead', 'contact_form_success'].map(event => ({ event, form_provider: 'hubspot' })));
+    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_success', 'generate_lead', 'contact_form_success'].map(event => ({ event, form_provider: 'notion' })));
     expect(JSON.stringify(window.dataLayer)).not.toContain(lead.email);
   });
   it('does not generate a lead on error/202 and permits retry', async () => {
@@ -119,54 +199,34 @@ describe('form submission and analytics', () => {
     const api = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({ success: true }, { status: 202 })).mockResolvedValueOnce(Response.json({ success: true }));
     const submit = createSubmission(api);
     expect(await submit(lead, () => {})).toBe(false);
-    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'hubspot' });
+    expect(window.dataLayer).not.toContainEqual({ event: 'generate_lead', form_provider: 'notion' });
     expect(await submit(lead, () => {})).toBe(true);
   });
 });
 
 describe('safe production diagnostics', () => {
-  it.each([
-    ['/properties/', 'consent_schema', 403],
-    ['idProperty=email', 'contact_lookup', 401],
-    ['/objects/contacts', 'contact_write', 400],
-    ['/objects/deals', 'deal_create', 400],
-    ['/associations/default/', 'association', 403],
-  ])('identifies %s failures without leaking input/provider content', async (marker, step, upstreamStatus) => {
+  it.each([400, 401, 403, 500])('logs Notion failure %s without leaking input/provider content', async upstreamStatus => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const api = vi.fn<typeof fetch>(async (url, init) => {
-      const path = String(url);
-      const fail = marker === '/objects/contacts' ? path.endsWith(marker) && init?.method === 'POST' : marker === '/objects/deals' ? path.endsWith(marker) : path.includes(marker);
-      if (fail) return Response.json({ message: `private ${lead.email} ${config.HUBSPOT_SERVICE_KEY}` }, { status: upstreamStatus });
-      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
-      if (init?.method === 'GET') return new Response(null, { status: 404 });
-      if (path.endsWith('/contacts')) return Response.json({ id: '101' });
-      return Response.json({ id: '202' });
-    });
-    vi.stubGlobal('fetch', api);
-    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), { ...config, ASSETS: { fetch: api } });
+    vi.stubGlobal('fetch', fakeApis({ notion: upstreamStatus }));
+    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }), env);
     expect(response.status).toBe(502);
     const diagnostic = JSON.parse(log.mock.calls[0]![0]);
-    expect(diagnostic).toMatchObject({ event: 'lead_delivery_failed', step, reason: 'upstream_rejected', upstreamStatus });
+    expect(diagnostic).toMatchObject({ event: 'lead_delivery_failed', step: 'page_create', reason: 'upstream_rejected', upstreamStatus });
     expect(response.headers.get('X-Request-Id')).toBe(diagnostic.reference);
     const output = JSON.stringify(log.mock.calls) + await response.text();
-    for (const value of [lead.email, lead.name, lead.challenge, config.HUBSPOT_SERVICE_KEY, 'private']) expect(output).not.toContain(value);
-  });
-  it('completes the public request only after contact, deal and association succeed', async () => {
-    const api = vi.fn<typeof fetch>(async (url, init) => {
-      const path = String(url);
-      if (path.includes('/properties/')) return Response.json({ type: 'datetime' });
-      if (init?.method === 'GET') return new Response(null, { status: 404 });
-      if (path.includes('/associations/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
-      return Response.json({ id: path.endsWith('/contacts') ? '101' : '202' });
-    });
-    vi.stubGlobal('fetch', api);
-    const response = await worker.fetch(new Request('https://site.test/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://site.test' }, body: JSON.stringify({ ...lead, whatsapp: '+5548000000000' }) }), { ...config, ASSETS: { fetch: api } });
-    expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ success: true });
-    expect(api).toHaveBeenCalledTimes(5);
+    for (const value of [lead.email, lead.name, lead.challenge, config.NOTION_TOKEN, 'private']) expect(output).not.toContain(value);
   });
 });
 
+describe('form options', () => {
+  it('offers exactly the challenge types and budgets the server accepts', () => {
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const optionsOf = (name: string) => [...html.match(new RegExp(`<select name="${name}"[\\s\\S]*?</select>`))![0].matchAll(/<option>([^<]+)<\/option>/g)].map(match => match[1]);
+    expect(optionsOf('challengeType')).toEqual([...challengeTypes]);
+    expect(optionsOf('investmentRange')).toEqual([...investmentRanges]);
+    for (const [, type] of html.matchAll(/data-challenge-type="([^"]+)"/g)) expect(challengeTypes).toContain(type);
+  });
+});
 
 describe('qualification and attribution', () => {
   it('accepts every budget without rejecting lower investments', () => {
@@ -177,21 +237,6 @@ describe('qualification and attribution', () => {
   it.each([{ challengeType: 'untrusted' }, { investmentRange: 'custom' }, { attribution: { email: 'private' } }, { attribution: { utm_source: 'person@example.com' } }, { attribution: { referrer: 'https://example.com/private?email=x' } }])('rejects unsafe qualification %j', fields => {
     expect(() => validateLead({ ...lead, ...fields })).toThrow();
   });
-  it('preserves qualified input in the existing CRM field without new properties', async () => {
-    const qualified = validateLead({ ...lead, challengeType: 'Integrações e dados', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin', referrer: 'https://example.com' } });
-    const api = vi.fn<typeof fetch>(async (url, init) => {
-      if (String(url).includes('/properties/')) return Response.json({ type: 'datetime' });
-      if (init?.method === 'GET') return Response.json({ id: '101' });
-      if (String(url).includes('/associations/')) return Response.json({ status: 'COMPLETE', results: [{ from: { id: '202' }, to: { id: '101' } }] });
-      return Response.json({ id: String(url).endsWith('/deals') ? '202' : '101' });
-    });
-    await saveLead(qualified, config, receivedAt, api);
-    const deal = JSON.parse(String(api.mock.calls.find(([url]) => String(url).endsWith('/deals'))![1]?.body)).properties;
-    expect(deal.desafio_do_projeto).toContain('O que deseja melhorar: Integrações e dados');
-    expect(deal.desafio_do_projeto).toContain('Faixa de investimento: Até R$ 10 mil');
-    expect(deal.desafio_do_projeto).toContain('utm_source: linkedin');
-    expect(Object.keys(deal)).toHaveLength(6);
-  });
   it('analytics failure cannot turn a successful submission into an error', async () => {
     vi.stubGlobal('window', { dataLayer: { push() { throw new Error('Blocked'); } } });
     const states: FormState[] = [];
@@ -201,6 +246,6 @@ describe('qualification and attribution', () => {
   it.each([() => Promise.reject(new DOMException('Timeout', 'TimeoutError')), () => Promise.resolve(new Response('invalid json'))])('reports failed transport without converting', async fetcher => {
     vi.stubGlobal('window', { dataLayer: [] });
     expect(await createSubmission(vi.fn<typeof fetch>(fetcher))(lead, () => {})).toBe(false);
-    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_error', 'contact_form_error'].map(event => ({ event, form_provider: 'hubspot' })));
+    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_error', 'contact_form_error'].map(event => ({ event, form_provider: 'notion' })));
   });
 });
