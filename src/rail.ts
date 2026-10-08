@@ -41,6 +41,52 @@ export function initRail(): void {
   });
   update();
 
+  // Mouse drag: the track follows the pointer, then settles on a panel in the drag direction.
+  let dragging = false;
+  let moved = false;
+  let startX = 0;
+  let startLeft = 0;
+  let lastX = 0;
+  let lastT = 0;
+  let velocity = 0;
+  track.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0 || (event.target as Element).closest('a, button')) return;
+    dragging = true;
+    moved = false;
+    startX = lastX = event.clientX;
+    startLeft = track.scrollLeft;
+    lastT = performance.now();
+    velocity = 0;
+  });
+  window.addEventListener('pointermove', event => {
+    if (!dragging) return;
+    const dx = event.clientX - startX;
+    if (!moved && Math.abs(dx) < 4) return;
+    if (!moved) { moved = true; track.classList.add('is-dragging'); }
+    const now = performance.now();
+    velocity = (event.clientX - lastX) / Math.max(1, now - lastT);
+    lastX = event.clientX;
+    lastT = now;
+    track.scrollLeft = startLeft - dx;
+  });
+  const release = () => {
+    if (!dragging) return;
+    dragging = false;
+    if (!moved) return;
+    const pad = parseFloat(getComputedStyle(track).paddingLeft);
+    const positions = panels.map(panel => panel.offsetLeft - pad);
+    let index = positions.reduce((best, left, i) => Math.abs(left - track.scrollLeft) < Math.abs(positions[best]! - track.scrollLeft) ? i : best, 0);
+    // A quick flick moves at least one panel in that direction.
+    if (velocity < -.3 && positions[index]! <= track.scrollLeft) index += 1;
+    if (velocity > .3 && positions[index]! >= track.scrollLeft) index -= 1;
+    index = Math.max(0, Math.min(panels.length - 1, index));
+    track.classList.remove('is-dragging');
+    track.scrollTo({ left: positions[index], behavior: reduced.matches ? 'auto' : 'smooth' });
+  };
+  window.addEventListener('pointerup', release);
+  window.addEventListener('pointercancel', release);
+  track.addEventListener('dragstart', event => event.preventDefault());
+
   // Visuals start when a panel is mostly visible; the view event is sent once per panel.
   const seen = new Set<string>();
   const observer = new IntersectionObserver(entries => {

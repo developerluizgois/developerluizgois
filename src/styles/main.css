@@ -159,6 +159,12 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
   padding: 4px var(--peek) 8px; scrollbar-width: none;
 }
 .rail-track::-webkit-scrollbar { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .rail-track { cursor: grab; }
+  .rail-track.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+  .rail-track.is-dragging * { pointer-events: none; }
+  .rail-track .panel-cta { cursor: pointer; }
+}
 .rail-track:focus-visible { outline-offset: -2px; }
 .rail-button { position: absolute; z-index: 2; top: 50%; display: grid; place-items: center; width: 48px; height: 48px; margin-top: -24px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--ink); cursor: pointer; transition: background-color .2s, border-color .2s, opacity .2s; }
 .rail-prev { left: max(8px, calc(var(--gutter) / 2 - 24px)); }
@@ -175,7 +181,7 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .panel-cta span { transition: transform .2s var(--ease); }
 .panel-cta:hover { background: currentColor; }
 .panel-cta:hover span { transform: translateX(3px); }
-.panel-activation .panel-cta:hover, .panel-ai .panel-cta:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.panel-activation .panel-cta:hover, .panel-ai .panel-cta:hover, .panel-auto .panel-cta:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .panel-revenue .panel-cta:hover, .panel-retention .panel-cta:hover, .panel-ops .panel-cta:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 .panel-visual path, .panel-visual line, .panel-visual rect, .panel-visual circle, .panel-visual ellipse, .panel-visual polyline { vector-effect: non-scaling-stroke; }
 
@@ -188,6 +194,11 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .panel-ops { background: var(--black); color: var(--on-black); }
 .panel-ai { background: var(--paper-2); color: var(--ink); --c-line: #b8c2d0; --c-strong: var(--ink); --c-accent: var(--navy-500); --c-text: var(--ink); --c-muted: var(--muted); --c-soft: var(--white); --c-on-accent: var(--white); }
 .panel-ai .mv-accent[opacity] { fill: var(--accent); }
+.panel-auto { background: var(--accent); color: var(--ink); --c-line: var(--navy-400); --c-strong: var(--ink); --c-accent: var(--navy-700); --c-text: var(--ink); --c-muted: var(--navy-700); --c-soft: var(--paper); --c-on-accent: var(--paper); }
+.mv-bubble { fill: var(--white); stroke: var(--c-line); stroke-width: 1.2; }
+.mv-check { fill: none; stroke: var(--c-on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.panel-visual .mv-on-accent { font-size: 13px; }
+.panel-visual circle.mv-on-accent { fill: var(--c-on-accent); }
 .panel-visual text, .scene text { font-family: var(--sans); }
 .mv-line { fill: none; stroke: var(--c-line); stroke-width: 1.5; }
 .mv-dash { fill: none; stroke: var(--c-line); stroke-width: 1.5; stroke-dasharray: 3 5; }
@@ -390,6 +401,7 @@ form .button { width: 100%; margin-top: 28px; }
   .scene .mv-muted { font-size: 19px; }
   .panel-visual .mv-text, .panel-visual .mv-on-accent { font-size: 15px; }
   .panel-visual .mv-muted { font-size: 14px; }
+  .panel-auto .panel-visual .mv-text, .panel-auto .panel-visual .mv-on-accent, .panel-auto .panel-visual .mv-muted { font-size: 13px; }
 
   .person-photo { max-height: none; min-height: 0; }
   .footer-statement { font-size: clamp(48px, 15vw, 72px); }
