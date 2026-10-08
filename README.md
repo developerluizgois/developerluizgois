@@ -94,6 +94,7 @@ Container: `GTM-KW3WSNGQ`. **Ele não está no HTML**: `src/consent.ts` só o ca
 - O aviso já vem no HTML. Um script inline no `<head>` marca `<html class="consent-known">` antes da primeira pintura quando existe escolha salva, então o aviso não espera o bundle principal (no celular, ele chegou a ser o LCP com 2,3 s de atraso) e não pisca para quem já escolheu. O `src/consent.ts` confirma a validade de 12 meses e reexibe o aviso se a escolha expirou.
 - Sinais de anúncios (`ad_storage`, `ad_user_data`, `ad_personalization`) ficam sempre negados: o site não usa anúncios. Se o Google Ads entrar, o aviso precisa de uma categoria própria para publicidade.
 - Não há fallback `noscript`: sem JavaScript não há como registrar consentimento.
+- O **Cloudflare Web Analytics** fica ativo por injeção automática da Cloudflare (`static.cloudflareinsights.com`), fora do aviso: não usa cookies nem identifica o visitante, mede visitas e Core Web Vitals de usuários reais e conta também quem recusa o GA4. O texto de privacidade o menciona. Para desligar: painel da Cloudflare → Web Analytics → `luizgois.com` → Manage site.
 - Para usar o modo Visualizar do GTM, clique em **Aceitar** na janela aberta pelo Tag Assistant; sem aceite o contêiner não carrega.
 
 | Evento | Condição | Dados |
