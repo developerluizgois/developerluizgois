@@ -13,6 +13,7 @@
     "test": "vitest run",
     "check": "tsc --noEmit",
     "setup:notion": "node --experimental-strip-types scripts/setup-notion.ts",
+    "notion:users": "node --experimental-strip-types scripts/notion-users.ts",
     "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
