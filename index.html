@@ -19,12 +19,10 @@
   <link rel="preload" href="/assets/geist-regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KW3WSNGQ');</script>
+  <!-- Google Tag Manager (GTM-KW3WSNGQ) loads from src/consent.ts only after the visitor accepts measurement. -->
   <script type="module" src="/src/main.ts"></script>
 </head>
 <body>
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KW3WSNGQ" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
   <main id="conteudo">
@@ -368,11 +366,23 @@
         <summary>Privacidade</summary>
         <div class="privacy-body">
           <p>Luiz Gois utiliza os dados informados para entender a solicitação, responder e acompanhar a conversa. Nome, email, empresa ou produto, tipo de desafio, faixa de investimento, a descrição do contexto, WhatsApp e preferência de resposta (quando informados), origem da visita e consentimento são registrados com segurança no Notion, onde as solicitações são organizadas. Para priorizar o retorno, a descrição do desafio, a empresa ou produto, o tipo de desafio e o domínio do email são analisados por um serviço de IA da Anthropic, que não usa esses dados para treinar modelos. Para solicitar acesso, correção ou exclusão, use este mesmo formulário.</p>
-          <p>O Google Tag Manager gerencia a medição de navegação e interação. Os eventos personalizados desta página não incluem seus dados pessoais nem o conteúdo da mensagem. O consentimento de contato não representa inscrição em comunicações de marketing.</p>
+          <p>Cookies: o Google Tag Manager e o Google Analytics só são carregados se você aceitar a medição no aviso de cookies. Eles medem visitas e interações de forma agregada, sem anúncios, e os eventos desta página não incluem seus dados pessoais nem o conteúdo da mensagem. Se você recusar, nada é enviado ao Google. Para mudar a escolha, use o botão Cookies no rodapé. O consentimento de contato não representa inscrição em comunicações de marketing.</p>
         </div>
       </details>
-      <p>© 2026 Luiz Gois</p>
+      <div class="footer-meta">
+        <button type="button" class="cookie-reopen" data-consent-open>Cookies</button>
+        <p>© 2026 Luiz Gois</p>
+      </div>
     </div>
   </footer>
+
+  <section class="cookie-notice" data-consent-banner aria-labelledby="consent-title" hidden>
+    <h2 class="sr-only" id="consent-title">Aviso de cookies</h2>
+    <p class="cookie-copy">Uso cookies do Google Analytics para entender como o site é usado, sem anúncios. Se você recusar, nada é enviado ao Google. <a href="#privacidade">Privacidade</a></p>
+    <div class="cookie-actions">
+      <button type="button" class="cookie-button" data-consent="denied">Recusar</button>
+      <button type="button" class="cookie-button" data-consent="granted">Aceitar</button>
+    </div>
+  </section>
 </body>
 </html>

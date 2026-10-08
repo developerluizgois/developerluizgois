@@ -1,4 +1,5 @@
 import './styles/main.css';
+import { initConsent } from './consent';
 import { initContactForm } from './contact';
 import { initMetrics } from './metrics';
 import { initRail } from './rail';
@@ -9,6 +10,7 @@ import { trackAnnouncementClick, trackContactClick, trackSocialClick, trackEvent
 
 if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion-ready');
 
+initConsent();
 initSmoothScroll();
 initAnchorLinks();
 initMotion();
