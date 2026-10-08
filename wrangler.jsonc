@@ -3,6 +3,10 @@
   "name": "developerluizgois",
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-02",
+  // Served only on the luizgois.com custom domain (attached in the dashboard). The workers.dev
+  // and preview URLs would publish an indexable duplicate of the site.
+  "workers_dev": false,
+  "preview_urls": false,
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "none",

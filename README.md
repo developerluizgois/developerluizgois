@@ -38,22 +38,25 @@ Os secrets `NOTION_TOKEN` e `ANTHROPIC_API_KEY` são lidos **somente pelo Worker
 
 Para testes locais feitos pelo proprietário, copie `.dev.vars.example` para `.dev.vars` e preencha o valor apenas no arquivo local. `.dev.vars`, suas variantes, `.env`, `.wrangler`, `node_modules` e `dist` estão ignorados. Este trabalho não usou nem solicitou a chave real.
 
-Deploy manual, quando autorizado pelo proprietário:
+### Deploy automático
+
+Todo merge na `main` publica o site pelo **Cloudflare Workers Builds**, conectado a `developerluizgois/developerluizgois`. Configuração no painel do Worker (**Settings → Builds → Production**):
+
+- Diretório raiz: `/`; branch de produção: `main`.
+- Build: `npm run build`. Deploy: `npx wrangler deploy`.
+- **Builds for Preview branches** desligado: o comando de preview em beta (`wrangler preview`) exige um bloco `previews` que apontaria para o mesmo Notion de produção.
+
+Os PRs são checados pelo GitHub Actions (`.github/workflows/ci.yml`): TypeScript, testes, build e `wrangler deploy --dry-run`, que valida a configuração gerada sem publicar nada. O workflow não usa secrets.
+
+O Worker responde só no custom domain `luizgois.com`, ligado pelo painel. `workers_dev` e `preview_urls` estão desligados no `wrangler.jsonc` para não publicar uma cópia indexável do site. Sem `routes` no arquivo, o deploy não altera os domínios configurados no painel.
+
+Deploy manual, se necessário (executa build e `wrangler deploy`):
 
 ```sh
 npm run deploy
 ```
 
-Esse comando executa build e `wrangler deploy`. **Não foi executado nesta implementação.** Não é um deploy de Cloudflare Pages; não envie apenas `dist/client`, pois a API precisa acompanhar os assets.
-
-Para conectar posteriormente GitHub → **Cloudflare Workers Builds** no Worker existente:
-
-- Repositório: `developerluizgois/developerluizgois`; diretório raiz: `/`.
-- Selecione a branch aprovada pelo proprietário. Não foi feito merge ou alteração de configuração de produção.
-- Instalação: `npm ci` (lockfile incluído).
-- Build: `npm run build`.
-- Deploy: `npx wrangler deploy` (o build já foi executado; `npm run deploy` também funciona, mas recompila).
-- Confirme o secret no ambiente de destino e as permissões da conexão GitHub/Cloudflare. Não é necessário disponibilizar a chave de serviço ao processo de build do frontend.
+Não é um deploy de Cloudflare Pages; não envie apenas `dist/client`, pois a API precisa acompanhar os assets.
 
 ## Fluxo de contato
 
@@ -134,15 +137,15 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 ## SEO e medição em produção
 
-O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Software, Produto e IA aplicada a resultado**. O build normal de produção gera:
+O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Engenharia de produto e growth para software**. O build normal de produção gera:
 
-- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card com o retrato de Luiz.
+- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph (com largura, altura e tipo da imagem) e Twitter Card com o retrato de Luiz. `apple-touch-icon.png` (180 px) para atalhos no iOS.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
-- JSON-LD com Person, WebSite e WebPage, nome, serviços descritos, retrato e perfis sociais reais. Não inclui números ilustrativos, avaliações ou resultados inventados.
+- JSON-LD com Person (com `knowsAbout` e os seis serviços dos painéis em `makesOffer`), WebSite, WebPage e FAQPage, retrato e perfis sociais reais. O FAQPage é lido do próprio HTML no build (`faqFromHtml`), então editar uma pergunta na página atualiza os dados estruturados. Ao mudar um serviço nos painéis, atualize a lista `services` em `build/seo.ts`. Não inclui números ilustrativos, avaliações ou resultados inventados.
 - `robots.txt` permitindo rastreamento da landing e informando o sitemap; `/api/` fica fora do rastreamento.
 - `sitemap.xml` contendo apenas a página canônica. Não há datas de atualização fictícias nem URLs separadas para cada seção.
 - Conteúdo e metadados no HTML entregue pelo servidor, sem depender da execução de JavaScript pelo buscador. Um H1, títulos de seção, formulário com labels e retrato com dimensões e texto alternativo.
-- Fonte local com preload; CSS/JS versionados pelo Vite. O retrato continua lazy loaded. O componente de exemplos fictícios foi removido. O mosaico usa apenas os resultados fornecidos por Luiz; o texto final está no HTML antes da animação.
+- Fonte local com preload; CSS/JS versionados pelo Vite. `public/_headers` faz cache de 1 ano (`immutable`) nos bundles com hash e de 1 semana nas imagens, fonte e ícones; o HTML continua sempre revalidado. O retrato continua lazy loaded. O componente de exemplos fictícios foi removido. O mosaico usa apenas os resultados fornecidos por Luiz; o texto final está no HTML antes da animação.
 - URLs inexistentes não usam fallback de SPA (`not_found_handling: none`), evitando páginas desconhecidas respondendo com a landing e status 200.
 
 A variável **de build** `SITE_URL` pode substituir o domínio, se necessário. Não é secret nem configuração do frontend em runtime. O padrão de produção já é `https://luizgois.com/`. `npm run dev` e builds com `--mode staging` geram `noindex, nofollow`, sem canonical/sitemap de produção. Use modo staging nas previews públicas. Não publique um build staging no domínio principal. Alterar o domínio exige rebuild.
