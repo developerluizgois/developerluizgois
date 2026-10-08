@@ -384,19 +384,19 @@ form .button { width: 100%; margin-top: 28px; }
 @media (max-width: 700px) {
   body { font-size: 16px; }
   .hero { padding-top: 40px; }
-  .hero h1 { font-size: clamp(40px, 11.4vw, 54px); }
+  .hero h1 { font-size: clamp(32px, 9.4vw, 44px); }
   .hero-lead { font-size: 17px; }
   .metric-card { width: 100%; }
   .mc-value { font-size: clamp(44px, 13vw, 58px); }
   .hero-foot { min-height: 0; padding: 40px 0; }
-  .hero-foot-inner { justify-items: start; }
-  .clients { justify-content: flex-start; flex-direction: column; align-items: flex-start; gap: 18px; }
-  .clients-list { justify-content: flex-start; gap: 14px 22px; }
+  .hero-foot-inner { justify-items: center; }
+  .clients { flex-direction: column; align-items: center; gap: 18px; }
+  .clients-list { justify-content: center; gap: 14px 22px; }
   .clients-list li { font-size: 15px; }
   .announce { border-radius: 14px; font-size: 14px; }
 
   .section-screen { min-height: 100svh; }
-  .center-head h2 { font-size: clamp(30px, 8.6vw, 40px); }
+  .center-head h2 { font-size: clamp(25px, 7vw, 32px); }
   .rail-button { display: none; }
   .rail-track { grid-auto-columns: calc((100vw - 2 * var(--gutter)) / 1.1); gap: 12px; }
   .panel { min-height: 0; max-height: none; }
@@ -411,7 +411,10 @@ form .button { width: 100%; margin-top: 28px; }
 
   .person-photo { max-height: none; min-height: 0; }
   .footer-statement { font-size: clamp(48px, 15vw, 72px); }
-  .footer-bottom { flex-direction: column; }
+  .footer-links { margin-left: auto; justify-content: flex-end; }
+  .footer-bottom { align-items: center; }
+  .privacy summary { margin-top: 0; }
+  .privacy[open] { flex-basis: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
