@@ -59,7 +59,7 @@ Para conectar posteriormente GitHub → **Cloudflare Workers Builds** no Worker 
 
 O visitante preenche o formulário na própria página. O frontend envia JSON somente para `POST /api/lead`, sem iframe ou redirecionamento.
 
-Campos: nome, e-mail, WhatsApp opcional, empresa/produto, desafio e consentimento. O Worker:
+Campos visíveis: nome, e-mail, empresa/produto, contexto e consentimento. O WhatsApp só aparece quando a pessoa marca “Prefiro receber a resposta por WhatsApp”; nesse caso o número é obrigatório e `contactPreference: "whatsapp"` é enviado junto. O Worker:
 
 1. Restringe método, origem, Content-Type, tamanho do body (16 KiB), campos e limites; rejeita honeypot preenchido e consentimento ausente.
 2. Captura o instante real de recebimento e consulta a definição existente de `data_do_consentimento_pelo_site`.
@@ -102,7 +102,8 @@ O botão é bloqueado durante envio, inclusive contra submissões concorrentes. 
 
 - `index.html`: única página, metadados, conteúdo, formulário e redes sociais do rodapé.
 - `src/main.ts`, `src/contact.ts`, `src/analytics.ts`: interações, envio e tracking sem PII.
-- `src/styles/main.css`: design editorial preservado com a mudança solicitada para azul-marinho, telas com encaixe nativo de rolagem e adaptação móvel.
+- `src/rail.ts`, `src/process.ts`: rail horizontal de “Onde eu entro” e palco sticky de “Como eu trabalho”.
+- `src/styles/main.css`: tokens da paleta original (navy, preto, marrom, papel) e todo o layout responsivo.
 - `worker/index.ts`, `worker/validation.ts`, `worker/hubspot.ts`: roteamento, validação e integração.
 - `shared/lead.ts`: contrato tipado entre camadas.
 - `public/assets/`: foto fornecida por Luiz, fonte local, licença e favicon atualizado.
@@ -133,7 +134,7 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 ## SEO e medição em produção
 
-O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois | Engenharia de Produto, Software e IA Aplicada**. O build normal de produção gera:
+O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Software, Produto e IA aplicada a resultado**. O build normal de produção gera:
 
 - Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card com o retrato de Luiz.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
@@ -216,3 +217,43 @@ GTM-KW3WSNGQ preservado. Criar os triggers desejados no GTM e validar GA4/Ads ap
 Baseline: TypeScript, 36 testes e build passaram. Após alterações: TypeScript, 48 testes (incluindo qualificação, atribuição, timeout, JSON inválido e analytics indisponível) e build passaram. Não existe script de lint. Verificação de SEO e âncoras é feita sobre o HTML de produção. Nenhuma pontuação Lighthouse foi medida.
 
 Validação manual final: publicar após revisão; enviar o formulário com cada faixa de investimento, conferir qualificação/origem no Deal e associação com Contact; validar sucesso, erro/reenvio, teclado móvel, notificação e confete; conferir eventos pelo Tag Assistant e GA4. A causa do 502 anterior não está confirmada como resolvida. As instruções de diagnóstico acima permanecem aplicáveis. A foto original permanece lazy loaded; não houve nova biblioteca.
+
+
+## Redesign editorial (7 de outubro de 2026)
+
+Mesma identidade, nova composição. A página tem seis áreas: header, hero, Onde eu entro, Como eu trabalho, Resultados em produção, Investimento + contato e footer/about.
+
+**Paleta.** Todas as cores vêm do site publicado: navy (`#0c1830`, `#14243f`, `#152440`, `#304b75`, `#648bc9`, `#819ac0`, `#c2d3f5`), papel (`#f3f4f5`, `#e9edf2`, `#fff`), neutros (`#606b7c`, `#ced4de`), preto `#191919` e marrom `#2a1e1a` com seus tons (`#f7f0e9`, `#cbb9ad`, `#b6a297`). Valores `rgb()` no CSS são apenas variações de opacidade dessas cores. Removidos: confete (`#a78668`) e o verde de sucesso. Tipografia preservada: Georgia nos títulos, Geist no texto.
+
+**Removido.** FAQ, “Para quem”, “Exemplos”, “Sobre” extenso, lista de stack, mosaico de cards, toast, confete, contadores animados, CTA final gigante e os selects de tipo de desafio e faixa de investimento. `challengeType` e `investmentRange` continuam aceitos pelo Worker para compatibilidade com páginas em cache.
+
+**Formulário.** Quatro campos visíveis + consentimento LGPD. WhatsApp por divulgação progressiva. A preferência é anexada ao `desafio_do_projeto` do Deal como “Preferência de resposta: WhatsApp”. O sucesso aparece no próprio componente, sem redirecionamento.
+
+**Eventos (sem PII).** Novos: `hero_cta_click` (`cta`: primary|results), `capability_view`, `process_step_view`, `case_view`, `investment_view`, `form_start`, `form_submit`, `form_submit_success`, `form_submit_error`, `social_click` (`network`, `placement`), `scroll_25|50|75|90`. Os nomes anteriores continuam sendo enviados em paralelo (`contact_form_start`, `contact_form_submit`, `generate_lead`, `contact_form_success`, `contact_form_error`, `contact_click`, `journey_click`, `hero_primary_cta_click`, `hero_results_cta_click`, `linkedin_click`), então os triggers existentes no GTM continuam funcionando. `solution_view` foi substituído por `capability_view`. `generate_lead` segue como única conversão recomendada.
+
+**Motion.** CSS + SVG + IntersectionObserver, sem biblioteca. Movimento contínuo só no diagrama do hero e nas cenas visíveis. `prefers-reduced-motion` mostra o estado final de cada visual, sem deslocamentos.
+
+**Imagens.** Footer usa `luiz-gois-480.jpg` (38 KB); OG usa `luiz-gois-og.jpg` (1200 px, 170 KB). O original fica em `public/assets/luiz-gois.jpg`, sem uso na página.
+
+Validação: TypeScript, 52 testes e build passaram. Não existe script de lint no projeto.
+
+
+## Nova estrutura (8 de outubro de 2026)
+
+Sem header. A primeira tela é sempre o hero navy, em três zonas: texto e CTA (“Quero mudar meu cenário” → `#contato`), card de indicadores rotativo e, embaixo, “Projetos realizados com” + anúncio para `https://mentor.wokepeople.com/` com `utm_source=luizgois.com`, `utm_medium=referral`, `utm_campaign=luizgois_site`, `utm_content=hero_announcement`. (`www.mentor.wokepeople.com` não resolve no DNS.)
+
+Seções: Minha expertise (altura de tela, cinco cards), Como eu trabalho (quatro etapas, palco sticky no desktop), Quem está por trás (altura de tela), formulário centralizado e footer “O bom pode ser melhor.”. Removidos: Resultados em produção, bloco de investimento e header.
+
+**Card de indicadores** (`src/metrics.ts`): troca a cada 4,8 s, pausa com mouse/foco/botão e não roda sozinho com `prefers-reduced-motion`. Os seis indicadores também estão em lista para leitores de tela.
+
+**Logos** em `public/assets/logos/`, exibidos em escala de cinza para manter a paleta. Dois aparecem sem nome, por escolha do proprietário.
+
+**Eventos novos:** `hero_metric_select`, `announcement_click`, `team_view`. Saíram `journey_click`, `hero_results_cta_click`, `case_view` e `investment_view`, porque os elementos não existem mais.
+
+## Motion e scroll (8 de outubro de 2026, revisão 2)
+
+- **Scroll suave:** Lenis `1.3.26` (≈6 KB gzip) em `src/scroll.ts`. Atua em roda e trackpad; o toque continua nativo e `prefers-reduced-motion` mantém o scroll nativo. Links internos deslizam até a seção. O rail horizontal mantém o gesto lateral nativo (`data-lenis-prevent-horizontal`).
+- **Visuais dos cards e etapas:** SVG com animação SMIL (sem biblioteca). `src/motion.ts` pausa cada SVG fora da tela e as cenas inativas do palco sticky. Com reduced motion, cada visual congela num quadro representativo (`data-still`).
+- **“Quero esse serviço”:** cada card leva ao formulário e preenche “O que está acontecendo?” com um texto do contexto (`data-prefill`), sem sobrescrever o que a pessoa já escreveu. Eventos: `contact_click` (`placement: service`) e `service_cta_click` (`content_id`).
+- A última etapa de “Como eu trabalho” tem o CTA “Quero mudar meu cenário” (`contact_click`, `placement: process`).
+- Logos com as cores originais: Woke, Leads2b, Shop2gether, Workana e Upwork.

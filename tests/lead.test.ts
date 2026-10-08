@@ -20,6 +20,11 @@ describe('server validation', () => {
     { whatsapp: 'abc' }, { name: ' ' }, { challenge: 'short' }, { companyOrProduct: 'x'.repeat(161) },
     { unexpected: 'field' }, { name: null },
   ])('rejects invalid payload %j', patch => { expect(() => validateLead({ ...lead, ...patch })).toThrow(); });
+  it('accepts a WhatsApp reply preference only together with a valid number', () => {
+    expect(validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp' })).toMatchObject({ whatsapp: '+5548999999999', contactPreference: 'whatsapp' });
+    expect(() => validateLead({ ...lead, contactPreference: 'whatsapp' })).toThrow();
+    expect(() => validateLead({ ...lead, whatsapp: '+5548999999999', contactPreference: 'email' })).toThrow();
+  });
 });
 
 describe('HubSpot mapping without external calls', () => {
@@ -54,6 +59,12 @@ describe('HubSpot mapping without external calls', () => {
     expect(consentTimestamp('datetime', receivedAt)).toBe('2026-10-02T15:22:33.444Z');
     expect(consentTimestamp('date', receivedAt)).toBe('2026-10-02');
     expect(() => consentTimestamp('string', receivedAt)).toThrow();
+  });
+  it('records the WhatsApp reply preference on the deal', async () => {
+    const api = fakeApi(false);
+    await saveLead({ ...lead, whatsapp: '+5548999999999', contactPreference: 'whatsapp' }, config, receivedAt, api);
+    const dealWrite = api.mock.calls.find(([url]) => String(url).endsWith('/deals'))!;
+    expect(JSON.parse(String(dealWrite[1]?.body)).properties.desafio_do_projeto).toBe(`${lead.challenge}\n\nPreferência de resposta: WhatsApp`);
   });
   it('does not confirm success for provider errors or unfinished associations', async () => {
     await expect(saveLead(lead, config, receivedAt, vi.fn<typeof fetch>().mockResolvedValue(new Response('private provider detail', { status: 500 })))).rejects.toThrow('Lead processing unavailable');
@@ -100,7 +111,8 @@ describe('form submission and analytics', () => {
     resolve(Response.json({ success: true }));
     expect(await first).toBe(true);
     expect(states).toEqual(['submitting', 'success']);
-    expect(window.dataLayer).toEqual(['contact_form_submit', 'generate_lead', 'contact_form_success'].map(event => ({ event, form_provider: 'hubspot' })));
+    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_success', 'generate_lead', 'contact_form_success'].map(event => ({ event, form_provider: 'hubspot' })));
+    expect(JSON.stringify(window.dataLayer)).not.toContain(lead.email);
   });
   it('does not generate a lead on error/202 and permits retry', async () => {
     vi.stubGlobal('window', { dataLayer: [] });
@@ -189,6 +201,6 @@ describe('qualification and attribution', () => {
   it.each([() => Promise.reject(new DOMException('Timeout', 'TimeoutError')), () => Promise.resolve(new Response('invalid json'))])('reports failed transport without converting', async fetcher => {
     vi.stubGlobal('window', { dataLayer: [] });
     expect(await createSubmission(vi.fn<typeof fetch>(fetcher))(lead, () => {})).toBe(false);
-    expect(window.dataLayer).toEqual(['contact_form_submit', 'contact_form_error'].map(event => ({ event, form_provider: 'hubspot' })));
+    expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_error', 'contact_form_error'].map(event => ({ event, form_provider: 'hubspot' })));
   });
 });

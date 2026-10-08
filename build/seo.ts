@@ -18,20 +18,20 @@ export function seoPlugin(siteUrl?: string): Plugin {
         { tag: 'meta', attrs: { name: 'robots', content: url ? 'index, follow, max-image-preview:large' : 'noindex, nofollow' }, injectTo: 'head' },
       ];
       if (!url) return tags;
-      const image = url + 'assets/luiz-gois.jpg';
+      const image = url + 'assets/luiz-gois-og.jpg';
       tags.push(
         { tag: 'link', attrs: { rel: 'canonical', href: url }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:url', content: url }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image', content: image }, injectTo: 'head' },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Luiz Gois, engenheiro de software e especialista em IA aplicada' }, injectTo: 'head' },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Retrato de Luiz Gois, Senior Software Engineer' }, injectTo: 'head' },
         { tag: 'meta', attrs: { name: 'twitter:image', content: image }, injectTo: 'head' },
         { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Retrato de Luiz Gois' }, injectTo: 'head' },
         { tag: 'script', attrs: { type: 'application/ld+json' }, injectTo: 'head', children: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [
-            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Engenharia de software, IA aplicada e desenvolvimento de produtos digitais.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
-            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois | Engenharia de Produto, Software e IA Aplicada', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois | Engenharia de Produto, Software e IA Aplicada', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Engenharia de produto, software sob medida e IA aplicada para aumentar conversão, automatizar operações e integrar dados e sistemas.' },
+            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Senior Software Engineer há mais de 6 anos trabalhando com produto e engenharia, resolvendo desafios de conversão e engajamento.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
+            { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
+            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Desenho, implemento e acompanho a experiência de consumo e relacionamento do seu software, combinando engenharia, dados e IA para conduzir, monetizar e fidelizar seus clientes.' },
           ],
         }).replace(/</g, '\\u003c') },
       );

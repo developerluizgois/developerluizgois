@@ -2,6 +2,7 @@ export interface LeadPayload {
   name: string;
   email: string;
   whatsapp?: string;
+  contactPreference?: 'whatsapp';
   companyOrProduct: string;
   challenge: string;
   challengeType?: typeof challengeTypes[number];
