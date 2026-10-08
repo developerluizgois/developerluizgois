@@ -85,7 +85,15 @@ Timeouts: Notion 15 s por chamada, IA 25 s com um retry, frontend 30 s. Nenhum b
 
 ## GTM e privacidade
 
-Container preservado: `GTM-KW3WSNGQ`, com script e fallback `noscript`.
+Container: `GTM-KW3WSNGQ`. **Ele não está no HTML**: `src/consent.ts` só o carrega depois que o visitante aceita a medição no aviso de cookies.
+
+- Antes de qualquer escolha, o Consent Mode do Google fica com todos os sinais em `denied` e o GTM não é baixado. Nada é enviado ao Google.
+- **Aceitar**: `consent update` com `analytics_storage: granted` e carregamento do GTM. A escolha fica em `localStorage` (`lg-consent`) por 12 meses; depois disso o aviso aparece de novo.
+- **Recusar**: o GTM nunca carrega. Quem aceitou antes e depois recusa tem `analytics_storage` revertido para `denied` e os cookies `_ga`/`_ga_*` apagados.
+- O botão **Cookies** no rodapé reabre o aviso. Os dois botões têm o mesmo peso visual, sem opção pré-marcada.
+- Sinais de anúncios (`ad_storage`, `ad_user_data`, `ad_personalization`) ficam sempre negados: o site não usa anúncios. Se o Google Ads entrar, o aviso precisa de uma categoria própria para publicidade.
+- Não há fallback `noscript`: sem JavaScript não há como registrar consentimento.
+- Para usar o modo Visualizar do GTM, clique em **Aceitar** na janela aberta pelo Tag Assistant; sem aceite o contêiner não carrega.
 
 | Evento | Condição | Dados |
 | --- | --- | --- |
@@ -95,7 +103,7 @@ Container preservado: `GTM-KW3WSNGQ`, com script e fallback `noscript`.
 | `generate_lead` | HTTP 200 com `success: true` da API | `form_provider`: notion |
 | `faq_open` | Pergunta do FAQ aberta | `content_id`: id da pergunta |
 
-Não há dados pessoais, respostas ou IDs de CRM nesses eventos. Tags/consentimento adicionais dentro do container são administrados pelo proprietário no GTM. Não foram criadas ou publicadas tags nessa conta.
+Não há dados pessoais, respostas ou IDs de CRM nesses eventos. Antes do aceite, os eventos ficam apenas no `dataLayer` da página; quando o visitante aceita, o GTM processa também os eventos que já estavam na fila daquela visita.
 
 O botão é bloqueado durante envio, inclusive contra submissões concorrentes. Em falha, os campos são preservados; em sucesso, são limpos e a mensagem de recebimento aparece na mesma seção.
 
@@ -166,7 +174,7 @@ O container **GTM-KW3WSNGQ** continua sendo o único ponto de instalação. Não
 2. Criar triggers de Custom Event com nomes exatos `journey_click`, `contact_click`, `contact_form_start` e `generate_lead`, associados às respectivas tags de evento GA4. Usar as variáveis de Data Layer `placement`, `destination` e `form_provider` quando presentes. São parâmetros sem dados pessoais.
 3. Marcar `generate_lead` como evento principal no GA4. Ele só ocorre após HTTP 200 e `success: true`, com confirmação do contato, negócio e associação. `form_submit`, `contact_click` e `contact_form_start` não comprovam conversão. Se a medição automática de formulários do GA4 gerar ruído, desativá-la e manter os eventos explícitos.
 4. Para Ads, escolher uma única conversão principal para o mesmo lead: importar o evento principal do GA4 OU disparar a tag de conversão Ads em `generate_lead`. Não contar as duas como conversões principais da mesma ação. Configurar Conversion Linker/Google tag conforme o caminho escolhido.
-5. Configurar consentimento de Analytics e publicidade no GTM/CMP antes de publicar essas tags. O checkbox do formulário autoriza o tratamento da solicitação, não cookies ou personalização de anúncios. Não há CMP implementada nesta entrega; a configuração de tags e consentimento pertence à próxima etapa.
+5. O consentimento de cookies é feito no próprio site (ver **GTM e privacidade**); nenhuma configuração de consentimento é necessária no GTM. O checkbox do formulário autoriza o tratamento da solicitação, não cookies ou personalização de anúncios.
 6. No Tag Assistant/GA4 DebugView, conferir page_view único, clique, início do formulário, erro sem generate_lead e sucesso com um único generate_lead. Validar UTMs e auto tagging Ads na URL pública. Não enviar nome, email, telefone ou desafio como parâmetros de eventos, nem habilitar coleta desses campos por seletores automáticos.
 
 GTM instalado não significa que GA4/Ads já estejam recebendo eventos. IDs, tags, consentimento e publicação do container ainda precisam ser configurados pelo proprietário. Search Console mede a presença na busca; GA4 mede o uso do site. Instalar Analytics não garante nem melhora diretamente o posicionamento.
