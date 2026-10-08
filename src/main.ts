@@ -24,7 +24,9 @@ document.querySelectorAll<HTMLAnchorElement>('[data-cta]').forEach(link => {
 
 // "Quero esse serviço": glide to the form with an editable starting text for that service.
 const challenge = document.querySelector<HTMLTextAreaElement>('#contact-form [name="challenge"]')!;
+const challengeType = document.querySelector<HTMLSelectElement>('#contact-form [name="challengeType"]')!;
 let lastPrefill = '';
+let lastType = '';
 document.querySelectorAll<HTMLAnchorElement>('[data-prefill]').forEach(link => {
   link.addEventListener('click', event => {
     event.preventDefault();
@@ -35,6 +37,14 @@ document.querySelectorAll<HTMLAnchorElement>('[data-prefill]').forEach(link => {
       lastPrefill = text;
       challenge.removeAttribute('aria-invalid');
       document.getElementById('error-challenge')?.remove();
+    }
+    // Same rule for the challenge type: only fill it when the visitor has not picked one.
+    const type = link.dataset.challengeType ?? '';
+    if (type && (!challengeType.value || challengeType.value === lastType)) {
+      challengeType.value = type;
+      lastType = type;
+      challengeType.removeAttribute('aria-invalid');
+      document.getElementById('error-challengeType')?.remove();
     }
     trackContactClick('service', link.dataset.service);
     scrollToSection(document.querySelector<HTMLElement>('#contato')!, () => challenge.focus({ preventScroll: true }));

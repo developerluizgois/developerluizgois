@@ -30,11 +30,11 @@ Worker alvo: **`developerluizgois`**, exatamente o nome já existente. O plugin 
 Configuração não sensível em `wrangler.jsonc`:
 
 ```text
-HUBSPOT_PIPELINE_ID=default
-HUBSPOT_STAGE_NEW_ID=appointmentscheduled
+NOTION_DATA_SOURCE_ID=<id gerado por npm run setup:notion>
+NOTION_OWNER_ID=<id do usuário que recebe a notificação>
 ```
 
-O binding secreto obrigatório `HUBSPOT_SERVICE_KEY` é lido **somente pelo Worker**. Conforme informado, ele já está cadastrado em Production. Seu valor não está no repositório, no frontend ou no README. Não declare esse binding como `VITE_*` nem em `vars` do Wrangler.
+Os secrets `NOTION_TOKEN` e `ANTHROPIC_API_KEY` são lidos **somente pelo Worker** e cadastrados com `npx wrangler secret put <NOME>`. Seus valores não ficam no repositório, no frontend nem no README. Não os declare como `VITE_*` nem em `vars` do Wrangler.
 
 Para testes locais feitos pelo proprietário, copie `.dev.vars.example` para `.dev.vars` e preencha o valor apenas no arquivo local. `.dev.vars`, suas variantes, `.env`, `.wrangler`, `node_modules` e `dist` estão ignorados. Este trabalho não usou nem solicitou a chave real.
 
@@ -59,29 +59,26 @@ Para conectar posteriormente GitHub → **Cloudflare Workers Builds** no Worker 
 
 O visitante preenche o formulário na própria página. O frontend envia JSON somente para `POST /api/lead`, sem iframe ou redirecionamento.
 
-Campos visíveis: nome, e-mail, empresa/produto, contexto e consentimento. O WhatsApp só aparece quando a pessoa marca “Prefiro receber a resposta por WhatsApp”; nesse caso o número é obrigatório e `contactPreference: "whatsapp"` é enviado junto. O Worker:
+Campos visíveis: nome, e-mail, empresa/produto, tipo de desafio, investimento previsto, contexto e consentimento. O WhatsApp só aparece quando a pessoa marca “Prefiro receber a resposta por WhatsApp”; nesse caso o número é obrigatório. Os botões dos serviços preenchem o contexto e o tipo de desafio sem sobrescrever o que o visitante já escreveu. O Worker:
 
-1. Restringe método, origem, Content-Type, tamanho do body (16 KiB), campos e limites; rejeita honeypot preenchido e consentimento ausente.
-2. Captura o instante real de recebimento e consulta a definição existente de `data_do_consentimento_pelo_site`.
-3. Localiza o Contact pelo e-mail usando `idProperty=email`; atualiza quando existe ou cria quando não existe. Um conflito de criação concorrente é recuperado com nova leitura por e-mail.
-4. Grava `firstname`, `email`, `consentimento_pelo_site=true` e a data do consentimento. Só inclui `mobilephone` quando há WhatsApp; nunca limpa telefone existente por ausência desse campo.
-5. Cria sempre um novo Deal com `pipeline=default`, `dealstage=appointmentscheduled`, `empresa_ou_produto`, `desafio_do_projeto`, `origem_do_lead=Site` e nome legível.
-6. Associa Deal → Contact pela associação padrão da API v4, sem IDs numéricos de tipo hardcoded.
-7. Responde `{ "success": true }` apenas depois da associação concluída. Falhas retornam mensagens públicas genéricas e não expõem resposta do provedor, IDs ou segredo.
+1. Restringe método, origem, Content-Type, tamanho do body (16 KiB), campos e limites; rejeita honeypot preenchido e consentimento ausente. Tipo de desafio e investimento são validados por listas fechadas em `shared/lead.ts`.
+2. Calcula uma nota provisória só com regras (`worker/scoring.ts`) e cria uma página no banco “Contatos do site” do Notion, atribuída a `NOTION_OWNER_ID` e com uma menção a essa pessoa, o que dispara a notificação do Notion.
+3. Responde `{ "success": true }` assim que a página existe. Falhas retornam mensagens públicas genéricas e não expõem resposta do provedor, IDs ou segredo.
+4. Em segundo plano (`waitUntil`), envia ao Claude Haiku apenas empresa/produto, domínio do e-mail, tipo de desafio e descrição, e atualiza a página com nota final, classe, justificativa e primeira pergunta sugerida. Se a IA falhar, a página fica com a nota provisória e `Análise: Sem IA`; o contato nunca se perde.
+
+**Nota (0–100):** investimento 35 (escolha do visitante, nunca da IA), aderência ao cliente ideal 30, urgência 20, clareza 15. **Classe:** A ≥ 70, B ≥ 45, C abaixo disso.
 
 A API é same-origin e não abre CORS. Requisições sem `Origin` são aceitas para clientes HTTP legítimos; navegadores com origem diferente são rejeitados. Não existe autenticação de visitante. A proteção básica reduz abuso comum, mas não substitui rate limiting/WAF caso necessário no futuro.
 
-Timeout global do processamento externo: 20 segundos; timeout do frontend: 30 segundos. Não há retry automático de operações de escrita. Nenhum body, e-mail, telefone, mensagem, ID de contato/negócio ou chave é enviado aos logs pelo código da aplicação.
+Timeouts: Notion 15 s por chamada, IA 25 s com um retry, frontend 30 s. Nenhum body, e-mail, telefone, mensagem, ID de página ou chave é enviado aos logs pelo código da aplicação.
 
-## Propriedades e permissões do HubSpot
+## Configuração do Notion (uma vez)
 
-Nenhuma propriedade, pipeline ou estágio é criado por este projeto. A chave precisa permitir leitura/escrita de contatos, criação de negócios, associação e leitura do schema de propriedades de contatos (incluindo o escopo aplicável de schema, como `crm.schemas.contacts.read`).
-
-A data usa ISO 8601 segundo o tipo retornado pela API:
-
-- `datetime`: instante completo de recebimento em UTC, com milissegundos.
-- `date`: apenas `YYYY-MM-DD` UTC, como exige a propriedade. **Uma propriedade de tipo date não armazena hora.** Se deseja preservar o instante completo, confirme que a propriedade existente é `datetime`; o código não altera seu schema.
-- Outro tipo ou schema indisponível: erro seguro, sem tentar adivinhar o formato.
+1. Em [notion.so/my-integrations](https://www.notion.so/my-integrations), crie uma integração interna com permissão de ler, inserir e atualizar conteúdo e de ler informações de usuários, incluindo e-mail.
+2. Crie uma página no Notion (ex.: “CRM”) e compartilhe com a integração (`•••` → Conexões).
+3. No terminal, com o token só no seu ambiente: `NOTION_TOKEN=... NOTION_PARENT_PAGE=<link da página> npm run setup:notion`. O script cria o banco com todas as colunas e imprime `NOTION_DATA_SOURCE_ID` e `NOTION_OWNER_ID`.
+4. Coloque os dois IDs em `vars` no `wrangler.jsonc` e cadastre os secrets: `npx wrangler secret put NOTION_TOKEN` e `npx wrangler secret put ANTHROPIC_API_KEY`.
+5. No Notion, ordene a visão principal por `Nota` (decrescente) e filtre `Status` diferente de Fechado/Descartado.
 
 ## GTM e privacidade
 
@@ -91,8 +88,9 @@ Container preservado: `GTM-KW3WSNGQ`, com script e fallback `noscript`.
 | --- | --- | --- |
 | `journey_click` | CTA do hero para resultados | `placement`: hero; `destination`: resultados |
 | `contact_click` | CTA do rodapé para o formulário | `placement`: footer |
-| `contact_form_start` | Primeiro preenchimento do formulário | `form_provider`: hubspot |
-| `generate_lead` | HTTP 200 com `success: true` da API | `form_provider`: hubspot |
+| `contact_form_start` | Primeiro preenchimento do formulário | `form_provider`: notion |
+| `generate_lead` | HTTP 200 com `success: true` da API | `form_provider`: notion |
+| `faq_open` | Pergunta do FAQ aberta | `content_id`: id da pergunta |
 
 Não há dados pessoais, respostas ou IDs de CRM nesses eventos. Tags/consentimento adicionais dentro do container são administrados pelo proprietário no GTM. Não foram criadas ou publicadas tags nessa conta.
 
@@ -104,7 +102,9 @@ O botão é bloqueado durante envio, inclusive contra submissões concorrentes. 
 - `src/main.ts`, `src/contact.ts`, `src/analytics.ts`: interações, envio e tracking sem PII.
 - `src/rail.ts`, `src/process.ts`: rail horizontal de “Onde eu entro” e palco sticky de “Como eu trabalho”.
 - `src/styles/main.css`: tokens da paleta original (navy, preto, marrom, papel) e todo o layout responsivo.
-- `worker/index.ts`, `worker/validation.ts`, `worker/hubspot.ts`: roteamento, validação e integração.
+- `worker/index.ts`, `worker/validation.ts`: roteamento e validação.
+- `worker/notion.ts`, `worker/scoring.ts`, `worker/assessment.ts`: registro no Notion, nota e análise com IA.
+- `scripts/setup-notion.ts`: cria o banco de contatos no Notion.
 - `shared/lead.ts`: contrato tipado entre camadas.
 - `public/assets/`: foto fornecida por Luiz, fonte local, licença e favicon atualizado.
 - `vite.config.ts`, `wrangler.jsonc`, `tsconfig.json`, `vitest.config.ts`, `package-lock.json`: tooling/configuração.

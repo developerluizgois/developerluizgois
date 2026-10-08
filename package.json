@@ -12,6 +12,9 @@
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "test": "vitest run",
     "check": "tsc --noEmit",
+    "setup:notion": "node --experimental-strip-types scripts/setup-notion.ts",
+    "notion:users": "node --experimental-strip-types scripts/notion-users.ts",
+    "notion:check": "node --experimental-strip-types scripts/notion-check.ts",
     "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
@@ -23,6 +26,8 @@
     "wrangler": "^4.147.0"
   },
   "dependencies": {
-    "lenis": "1.3.26"
+    "@anthropic-ai/sdk": "^0.132.1",
+    "lenis": "1.3.26",
+    "zod": "^4.6.5"
   }
 }
