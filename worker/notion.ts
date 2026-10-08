@@ -1,5 +1,5 @@
 import type { LeadPayload } from '../shared/lead';
-import { tierFor, type Assessment } from './scoring';
+import { tierFor, type Assessment } from './scoring.ts';
 
 export const NOTION_VERSION = '2026-03-11';
 
@@ -11,9 +11,18 @@ export interface NotionConfig {
 
 type NotionStep = 'configuration' | 'page_create' | 'page_update';
 type FailureReason = 'configuration_missing' | 'upstream_rejected' | 'invalid_response' | 'timeout' | 'network_error';
+// Plain fields (no parameter properties) so Node can run this file directly in the setup scripts.
 export class NotionError extends Error {
   step?: NotionStep;
-  constructor(public readonly status: number, public readonly reason: FailureReason = 'invalid_response', public readonly upstreamStatus?: number) { super('Lead processing unavailable'); }
+  readonly status: number;
+  readonly reason: FailureReason;
+  readonly upstreamStatus?: number;
+  constructor(status: number, reason: FailureReason = 'invalid_response', upstreamStatus?: number) {
+    super('Lead processing unavailable');
+    this.status = status;
+    this.reason = reason;
+    this.upstreamStatus = upstreamStatus;
+  }
 }
 
 // Notion caps each text object at 2,000 characters; long descriptions are split, never cut.
