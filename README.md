@@ -147,7 +147,7 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 O domínio principal é **https://luizgois.com/**. O título é **Growth e engenharia de produto para SaaS | Luiz Gois**. O build normal de produção gera:
 
-- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph (com largura, altura e tipo da imagem) e Twitter Card com o retrato de Luiz. `apple-touch-icon.png` (180 px) para atalhos no iOS.
+- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card (`summary_large_image`) com o cartão `luiz-gois-social.jpg` (1200×630: título, linha de serviço, retrato e domínio), com largura, altura, tipo e texto alternativo. O JSON-LD de Person continua usando o retrato `luiz-gois-og.jpg`. `apple-touch-icon.png` (180 px) para atalhos no iOS.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
 - JSON-LD com Person (com `knowsAbout` e os seis serviços dos painéis em `makesOffer`), WebSite, WebPage e FAQPage, retrato e perfis sociais reais. O FAQPage é lido do próprio HTML no build (`faqFromHtml`), então editar uma pergunta na página atualiza os dados estruturados. Ao mudar um serviço nos painéis, atualize a lista `services` em `build/seo.ts`. Não inclui números ilustrativos, avaliações ou resultados inventados.
 - `robots.txt` permitindo rastreamento da landing e informando o sitemap; `/api/` fica fora do rastreamento.
