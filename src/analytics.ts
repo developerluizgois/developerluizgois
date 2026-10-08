@@ -22,10 +22,13 @@ export function trackForm(event: FormEvent): void {
   legacyFormEvents[event].forEach(legacy => trackEvent(legacy, { form_provider: 'hubspot' }));
 }
 
-export function trackContactClick(): void {
-  trackEvent('hero_cta_click', { cta: 'primary' });
-  trackEvent('contact_click', { placement: 'hero' });
-  trackEvent('hero_primary_cta_click');
+export function trackContactClick(placement: 'hero' | 'process' | 'service', service?: string): void {
+  trackEvent('contact_click', { placement, ...(service ? { content_id: service } : {}) });
+  if (placement === 'hero') {
+    trackEvent('hero_cta_click', { cta: 'primary' });
+    trackEvent('hero_primary_cta_click');
+  }
+  if (placement === 'service' && service) trackEvent('service_cta_click', { content_id: service });
 }
 
 export function trackAnnouncementClick(): void {

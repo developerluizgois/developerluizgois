@@ -12,15 +12,17 @@ describe('analytics events', () => {
   });
   it('keeps hero and social events limited to static identifiers', () => {
     vi.stubGlobal('window', { dataLayer: [] });
-    trackContactClick();
+    trackContactClick('hero');
+    trackContactClick('service', 'ativacao');
     trackAnnouncementClick();
     trackSocialClick('linkedin', 'footer');
-    const allowed = new Set(['event', 'placement', 'cta', 'destination', 'network', 'form_provider']);
+    const allowed = new Set(['event', 'placement', 'cta', 'destination', 'network', 'form_provider', 'content_id']);
     for (const entry of window.dataLayer as Record<string, string>[]) {
       expect(Object.keys(entry).every(key => allowed.has(key))).toBe(true);
     }
     expect(window.dataLayer).toContainEqual({ event: 'hero_cta_click', cta: 'primary' });
     expect(window.dataLayer).toContainEqual({ event: 'social_click', network: 'linkedin', placement: 'footer' });
     expect(window.dataLayer).toContainEqual({ event: 'linkedin_click' });
+    expect(window.dataLayer).toContainEqual({ event: 'service_cta_click', content_id: 'ativacao' });
   });
 });

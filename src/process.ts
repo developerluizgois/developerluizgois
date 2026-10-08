@@ -1,4 +1,5 @@
 import { trackEvent } from './analytics';
+import { syncMotion } from './motion';
 
 // Desktop: scenes move into one sticky stage and follow the step in the reading band.
 // Mobile and no-JS: each step keeps its own scene inline, in the same order.
@@ -16,6 +17,7 @@ export function initProcess(): void {
     steps.forEach((step, i) => step.classList.toggle('is-current', i === index));
     scenes.forEach((scene, i) => scene.classList.toggle('is-active', i === index));
     indicators.forEach((indicator, i) => indicator.classList.toggle('is-current', i === index));
+    syncMotion();
   }
 
   function record(step: HTMLElement): void {
@@ -33,6 +35,7 @@ export function initProcess(): void {
       layout!.classList.remove('is-enhanced');
       scenes.forEach((scene, i) => steps[i]!.prepend(scene));
     }
+    syncMotion();
   }
 
   // Active band: the middle of the viewport.

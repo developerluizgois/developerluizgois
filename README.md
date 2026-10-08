@@ -249,3 +249,11 @@ Seções: Minha expertise (altura de tela, cinco cards), Como eu trabalho (quatr
 **Logos** em `public/assets/logos/`, exibidos em escala de cinza para manter a paleta. Dois aparecem sem nome, por escolha do proprietário.
 
 **Eventos novos:** `hero_metric_select`, `announcement_click`, `team_view`. Saíram `journey_click`, `hero_results_cta_click`, `case_view` e `investment_view`, porque os elementos não existem mais.
+
+## Motion e scroll (8 de outubro de 2026, revisão 2)
+
+- **Scroll suave:** Lenis `1.3.26` (≈6 KB gzip) em `src/scroll.ts`. Atua em roda e trackpad; o toque continua nativo e `prefers-reduced-motion` mantém o scroll nativo. Links internos deslizam até a seção. O rail horizontal mantém o gesto lateral nativo (`data-lenis-prevent-horizontal`).
+- **Visuais dos cards e etapas:** SVG com animação SMIL (sem biblioteca). `src/motion.ts` pausa cada SVG fora da tela e as cenas inativas do palco sticky. Com reduced motion, cada visual congela num quadro representativo (`data-still`).
+- **“Quero esse serviço”:** cada card leva ao formulário e preenche “O que está acontecendo?” com um texto do contexto (`data-prefill`), sem sobrescrever o que a pessoa já escreveu. Eventos: `contact_click` (`placement: service`) e `service_cta_click` (`content_id`).
+- A última etapa de “Como eu trabalho” tem o CTA “Quero mudar meu cenário” (`contact_click`, `placement: process`).
+- Logos com as cores originais: Woke, Leads2b, Shop2gether, Workana e Upwork.
