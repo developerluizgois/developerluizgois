@@ -6,7 +6,7 @@ export class PayloadError extends Error {
 }
 
 const MAX_BODY_BYTES = 16 * 1024;
-const allowed = new Set(['name', 'email', 'whatsapp', 'companyOrProduct', 'challenge', 'consent', 'websiteCheck', 'challengeType', 'investmentRange', 'attribution']);
+const allowed = new Set(['name', 'email', 'whatsapp', 'companyOrProduct', 'challenge', 'consent', 'websiteCheck', 'contactPreference', 'challengeType', 'investmentRange', 'attribution']);
 
 function text(value: unknown, min: number, max: number, multiline = false): string {
   if (typeof value !== 'string' || value.length > max || /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(value)) throw new PayloadError();
@@ -36,6 +36,9 @@ export function validateLead(payload: unknown): LeadPayload {
       whatsapp = `${phone.startsWith('+') ? '+' : ''}${digits}`;
     }
   }
+  if (data.contactPreference !== undefined && data.contactPreference !== 'whatsapp') throw new PayloadError();
+  // Asking for a WhatsApp reply without a number would leave the lead unanswerable.
+  if (data.contactPreference === 'whatsapp' && !whatsapp) throw new PayloadError();
   const challengeType = data.challengeType === undefined ? undefined : text(data.challengeType, 1, 80);
   const investmentRange = data.investmentRange === undefined ? undefined : text(data.investmentRange, 1, 80);
   if (challengeType && !challengeTypes.includes(challengeType as typeof challengeTypes[number])) throw new PayloadError();
@@ -53,7 +56,7 @@ export function validateLead(payload: unknown): LeadPayload {
       attribution[key as typeof attributionKeys[number]] = clean;
     }
   }
-  return { ...(challengeType ? { challengeType: challengeType as typeof challengeTypes[number] } : {}), ...(investmentRange ? { investmentRange: investmentRange as typeof investmentRanges[number] } : {}), ...(Object.keys(attribution).length ? { attribution } : {}), name, email, ...(whatsapp ? { whatsapp } : {}), companyOrProduct, challenge, consent: true };
+  return { ...(challengeType ? { challengeType: challengeType as typeof challengeTypes[number] } : {}), ...(investmentRange ? { investmentRange: investmentRange as typeof investmentRanges[number] } : {}), ...(Object.keys(attribution).length ? { attribution } : {}), name, email, ...(whatsapp ? { whatsapp } : {}), ...(data.contactPreference === 'whatsapp' ? { contactPreference: 'whatsapp' as const } : {}), companyOrProduct, challenge, consent: true };
 }
 
 export async function readLead(request: Request): Promise<LeadPayload> {
