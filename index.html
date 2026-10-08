@@ -315,12 +315,16 @@
             <noscript><p class="form-status">Ative o JavaScript para enviar sua solicitação com segurança pelo formulário.</p></noscript>
           </form>
 
-          <div class="form-success" id="form-success" hidden tabindex="-1" aria-labelledby="success-title">
-            <p class="success-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/><path d="m15 25 6 6 12-13"/></svg></p>
-            <h3 id="success-title">Recebi.</h3>
-            <p data-success-copy>Vou ler seu contexto e responder por email em até 1 dia útil com o próximo passo.</p>
-            <p class="success-social">Enquanto isso: <a href="https://www.linkedin.com/in/euluizgois/" target="_blank" rel="noopener noreferrer" data-social="linkedin">LinkedIn</a> · <a href="https://www.instagram.com/euluizgois/" target="_blank" rel="noopener noreferrer" data-social="instagram">Instagram</a> · <a href="https://x.com/euluizgois" target="_blank" rel="noopener noreferrer" data-social="x">X</a></p>
-          </div>
+          <!-- Confirmation opens as a native modal: Esc, the close button and a click outside all close it. -->
+          <dialog class="success-dialog" id="form-success" aria-labelledby="success-title" aria-describedby="success-copy">
+            <div class="success-dialog-body">
+              <button type="button" class="dialog-close" data-dialog-close aria-label="Fechar confirmação"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+              <p class="success-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22"/><path d="m15 25 6 6 12-13"/></svg></p>
+              <h3 id="success-title" tabindex="-1" autofocus>Recebi.</h3>
+              <p id="success-copy" data-success-copy>Vou ler seu contexto e responder por email em até 1 dia útil com o próximo passo.</p>
+              <p class="success-social">Enquanto isso: <a href="https://www.linkedin.com/in/euluizgois/" target="_blank" rel="noopener noreferrer" data-social="linkedin">LinkedIn</a> · <a href="https://www.instagram.com/euluizgois/" target="_blank" rel="noopener noreferrer" data-social="instagram">Instagram</a> · <a href="https://x.com/euluizgois" target="_blank" rel="noopener noreferrer" data-social="x">X</a></p>
+            </div>
+          </dialog>
         </div>
       </div>
     </section>

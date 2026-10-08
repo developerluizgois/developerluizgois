@@ -1,6 +1,7 @@
 import { readAttribution } from './attribution';
 import type { LeadPayload } from '../shared/lead';
 import { trackForm } from './analytics';
+import { setScrollLocked } from './scroll';
 
 export type FormState = 'idle' | 'submitting' | 'success' | 'error';
 const errorMessage = 'Não foi possível enviar sua solicitação. Seus dados foram mantidos. Tente novamente.';
@@ -39,7 +40,7 @@ export function initContactForm(): void {
   const form = document.querySelector<HTMLFormElement>('#contact-form')!;
   const button = document.querySelector<HTMLButtonElement>('#submit-button')!;
   const status = document.querySelector<HTMLElement>('#form-status')!;
-  const success = document.querySelector<HTMLElement>('#form-success')!;
+  const success = document.querySelector<HTMLDialogElement>('#form-success')!;
   const fieldset = form.querySelector<HTMLFieldSetElement>('fieldset')!;
   const preferWhatsapp = form.querySelector<HTMLInputElement>('[name="preferWhatsapp"]')!;
   const whatsappField = document.querySelector<HTMLElement>('#whatsapp-field')!;
@@ -59,6 +60,11 @@ export function initContactForm(): void {
     if (on) whatsapp.focus();
   }
   preferWhatsapp.addEventListener('change', syncWhatsapp);
+
+  // The form stays in place, cleared, behind the confirmation modal.
+  success.querySelector('[data-dialog-close]')!.addEventListener('click', () => success.close());
+  success.addEventListener('click', event => { if (event.target === success) success.close(); });
+  success.addEventListener('close', () => setScrollLocked(false));
 
   form.addEventListener('input', (event) => {
     if ((event.target as HTMLInputElement).name === 'websiteCheck') return;
@@ -81,10 +87,8 @@ export function initContactForm(): void {
       form.reset();
       syncWhatsapp();
       started = false;
-      form.hidden = true;
-      success.hidden = false;
-      success.focus({ preventScroll: true });
-      success.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      success.showModal();
+      setScrollLocked(true);
     }
   }
 
