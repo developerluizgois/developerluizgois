@@ -38,22 +38,25 @@ Os secrets `NOTION_TOKEN` e `ANTHROPIC_API_KEY` são lidos **somente pelo Worker
 
 Para testes locais feitos pelo proprietário, copie `.dev.vars.example` para `.dev.vars` e preencha o valor apenas no arquivo local. `.dev.vars`, suas variantes, `.env`, `.wrangler`, `node_modules` e `dist` estão ignorados. Este trabalho não usou nem solicitou a chave real.
 
-Deploy manual, quando autorizado pelo proprietário:
+### Deploy automático
+
+Todo merge na `main` publica o site pelo **Cloudflare Workers Builds**, conectado a `developerluizgois/developerluizgois`. Configuração no painel do Worker (**Settings → Builds → Production**):
+
+- Diretório raiz: `/`; branch de produção: `main`.
+- Build: `npm run build`. Deploy: `npx wrangler deploy`.
+- **Builds for Preview branches** desligado: o comando de preview em beta (`wrangler preview`) exige um bloco `previews` que apontaria para o mesmo Notion de produção.
+
+Os PRs são checados pelo GitHub Actions (`.github/workflows/ci.yml`): TypeScript, testes, build e `wrangler deploy --dry-run`, que valida a configuração gerada sem publicar nada. O workflow não usa secrets.
+
+O Worker responde só no custom domain `luizgois.com`, ligado pelo painel. `workers_dev` e `preview_urls` estão desligados no `wrangler.jsonc` para não publicar uma cópia indexável do site. Sem `routes` no arquivo, o deploy não altera os domínios configurados no painel.
+
+Deploy manual, se necessário (executa build e `wrangler deploy`):
 
 ```sh
 npm run deploy
 ```
 
-Esse comando executa build e `wrangler deploy`. **Não foi executado nesta implementação.** Não é um deploy de Cloudflare Pages; não envie apenas `dist/client`, pois a API precisa acompanhar os assets.
-
-Para conectar posteriormente GitHub → **Cloudflare Workers Builds** no Worker existente:
-
-- Repositório: `developerluizgois/developerluizgois`; diretório raiz: `/`.
-- Selecione a branch aprovada pelo proprietário. Não foi feito merge ou alteração de configuração de produção.
-- Instalação: `npm ci` (lockfile incluído).
-- Build: `npm run build`.
-- Deploy: `npx wrangler deploy` (o build já foi executado; `npm run deploy` também funciona, mas recompila).
-- Confirme o secret no ambiente de destino e as permissões da conexão GitHub/Cloudflare. Não é necessário disponibilizar a chave de serviço ao processo de build do frontend.
+Não é um deploy de Cloudflare Pages; não envie apenas `dist/client`, pois a API precisa acompanhar os assets.
 
 ## Fluxo de contato
 
