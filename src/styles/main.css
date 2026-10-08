@@ -346,8 +346,9 @@ html.is-locked { overflow: hidden; }
 .cookie-reopen:hover { color: var(--on-navy); }
 
 /* Cookie notice: Accept and Refuse carry equal weight, as LGPD guidance asks. */
-.cookie-notice { position: fixed; z-index: 50; left: 16px; right: 16px; bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; max-width: 640px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); color: var(--ink); box-shadow: 0 18px 48px rgb(12 24 48 / .28); font-size: 14px; line-height: 1.55; }
-.cookie-notice[hidden] { display: none; }
+.cookie-notice { position: fixed; z-index: 50; left: 16px; right: 16px; bottom: 16px; display: none; flex-wrap: wrap; align-items: center; gap: 16px 24px; max-width: 640px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); color: var(--ink); box-shadow: 0 18px 48px rgb(12 24 48 / .28); font-size: 14px; line-height: 1.55; }
+/* Shown only with JS (the buttons need it) and while no choice is stored; see the inline script in index.html. */
+.js:not(.consent-known) .cookie-notice { display: flex; }
 .cookie-copy { flex: 1 1 280px; color: var(--muted); }
 .cookie-copy a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .cookie-actions { display: flex; gap: 10px; }

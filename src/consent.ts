@@ -65,16 +65,19 @@ export function initConsent(): void {
   const current = readConsent(storage);
   if (current === 'granted') loadGtm();
 
+  // Visibility is a class on <html> so the inline script in index.html can set it before first paint.
+  const root = document.documentElement;
   const banner = document.querySelector<HTMLElement>('[data-consent-banner]');
   if (!banner) return;
-  const show = () => { banner.hidden = false; };
-  if (!current) show();
+  const show = () => root.classList.remove('consent-known');
+  const hide = () => root.classList.add('consent-known');
+  if (current) hide(); else show();
 
   banner.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach(button => {
     button.addEventListener('click', () => {
       const choice = button.dataset.consent === 'granted' ? 'granted' : 'denied';
       saveConsent(storage, choice);
-      banner.hidden = true;
+      hide();
       if (choice === 'granted') {
         loadGtm();
       } else {

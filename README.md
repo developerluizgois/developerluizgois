@@ -91,6 +91,7 @@ Container: `GTM-KW3WSNGQ`. **Ele não está no HTML**: `src/consent.ts` só o ca
 - **Aceitar**: `consent update` com `analytics_storage: granted` e carregamento do GTM. A escolha fica em `localStorage` (`lg-consent`) por 12 meses; depois disso o aviso aparece de novo.
 - **Recusar**: o GTM nunca carrega. Quem aceitou antes e depois recusa tem `analytics_storage` revertido para `denied` e os cookies `_ga`/`_ga_*` apagados.
 - O botão **Cookies** no rodapé reabre o aviso. Os dois botões têm o mesmo peso visual, sem opção pré-marcada.
+- O aviso já vem no HTML. Um script inline no `<head>` marca `<html class="consent-known">` antes da primeira pintura quando existe escolha salva, então o aviso não espera o bundle principal (no celular, ele chegou a ser o LCP com 2,3 s de atraso) e não pisca para quem já escolheu. O `src/consent.ts` confirma a validade de 12 meses e reexibe o aviso se a escolha expirou.
 - Sinais de anúncios (`ad_storage`, `ad_user_data`, `ad_personalization`) ficam sempre negados: o site não usa anúncios. Se o Google Ads entrar, o aviso precisa de uma categoria própria para publicidade.
 - Não há fallback `noscript`: sem JavaScript não há como registrar consentimento.
 - Para usar o modo Visualizar do GTM, clique em **Aceitar** na janela aberta pelo Tag Assistant; sem aceite o contêiner não carrega.
