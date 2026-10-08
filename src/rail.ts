@@ -8,7 +8,6 @@ export function initRail(): void {
   const panels = [...track.querySelectorAll<HTMLElement>('.panel')];
   const prev = rail.querySelector<HTMLButtonElement>('[data-rail-prev]')!;
   const next = rail.querySelector<HTMLButtonElement>('[data-rail-next]')!;
-  const counter = rail.querySelector<HTMLElement>('[data-rail-current]')!;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const step = () => panels.length > 1 ? panels[1]!.offsetLeft - panels[0]!.offsetLeft : track.clientWidth;
@@ -18,8 +17,6 @@ export function initRail(): void {
   function update(): void {
     queued = false;
     const max = track.scrollWidth - track.clientWidth;
-    const index = Math.min(panels.length - 1, Math.round(track.scrollLeft / step()));
-    counter.textContent = String(index + 1).padStart(2, '0');
     prev.disabled = track.scrollLeft <= 2;
     next.disabled = track.scrollLeft >= max - 2;
   }

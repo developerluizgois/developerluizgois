@@ -22,18 +22,14 @@ export function trackForm(event: FormEvent): void {
   legacyFormEvents[event].forEach(legacy => trackEvent(legacy, { form_provider: 'hubspot' }));
 }
 
-export function trackContactClick(placement: 'hero' | 'header'): void {
-  trackEvent('contact_click', { placement });
-  if (placement === 'hero') {
-    trackEvent('hero_cta_click', { cta: 'primary' });
-    trackEvent('hero_primary_cta_click');
-  }
+export function trackContactClick(): void {
+  trackEvent('hero_cta_click', { cta: 'primary' });
+  trackEvent('contact_click', { placement: 'hero' });
+  trackEvent('hero_primary_cta_click');
 }
 
-export function trackJourneyClick(): void {
-  trackEvent('hero_cta_click', { cta: 'results' });
-  trackEvent('journey_click', { placement: 'hero', destination: 'resultados' });
-  trackEvent('hero_results_cta_click');
+export function trackAnnouncementClick(): void {
+  trackEvent('announcement_click', { destination: 'mentor_wokepeople' });
 }
 
 export function trackSocialClick(network: string, placement: string): void {

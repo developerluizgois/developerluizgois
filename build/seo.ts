@@ -29,9 +29,9 @@ export function seoPlugin(siteUrl?: string): Plugin {
         { tag: 'script', attrs: { type: 'application/ld+json' }, injectTo: 'head', children: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [
-            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Senior Software Engineer. Trabalha entre produto, engenharia, dados e IA para transformar gargalos reais em mudanças que chegam à produção.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
+            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Senior Software Engineer', description: 'Senior Software Engineer há mais de 6 anos trabalhando com produto e engenharia, resolvendo desafios de conversão e engajamento.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'] },
             { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', alternateName: 'Luiz Gois', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Ajudo empresas com produto em operação a destravar conversão, retenção e eficiência com software, integrações, automações e IA — do problema à produção.' },
+            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Luiz Gois — Software, Produto e IA aplicada a resultado', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, description: 'Desenho, implemento e acompanho a experiência de consumo e relacionamento do seu software, combinando engenharia, dados e IA para conduzir, monetizar e fidelizar seus clientes.' },
           ],
         }).replace(/</g, '\\u003c') },
       );

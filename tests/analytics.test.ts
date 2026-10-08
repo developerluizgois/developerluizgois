@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { trackContactClick, trackForm, trackJourneyClick, trackSocialClick } from '../src/analytics';
+import { trackAnnouncementClick, trackContactClick, trackForm, trackSocialClick } from '../src/analytics';
 
 afterEach(() => { vi.unstubAllGlobals(); });
 
@@ -12,8 +12,8 @@ describe('analytics events', () => {
   });
   it('keeps hero and social events limited to static identifiers', () => {
     vi.stubGlobal('window', { dataLayer: [] });
-    trackContactClick('hero');
-    trackJourneyClick();
+    trackContactClick();
+    trackAnnouncementClick();
     trackSocialClick('linkedin', 'footer');
     const allowed = new Set(['event', 'placement', 'cta', 'destination', 'network', 'form_provider']);
     for (const entry of window.dataLayer as Record<string, string>[]) {

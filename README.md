@@ -237,3 +237,15 @@ Mesma identidade, nova composição. A página tem seis áreas: header, hero, On
 
 Validação: TypeScript, 52 testes e build passaram. Não existe script de lint no projeto.
 
+
+## Nova estrutura (8 de outubro de 2026)
+
+Sem header. A primeira tela é sempre o hero navy, em três zonas: texto e CTA (“Quero mudar meu cenário” → `#contato`), card de indicadores rotativo e, embaixo, “Projetos realizados com” + anúncio para `https://mentor.wokepeople.com/` com `utm_source=luizgois.com`, `utm_medium=referral`, `utm_campaign=luizgois_site`, `utm_content=hero_announcement`. (`www.mentor.wokepeople.com` não resolve no DNS.)
+
+Seções: Minha expertise (altura de tela, cinco cards), Como eu trabalho (quatro etapas, palco sticky no desktop), Quem está por trás (altura de tela), formulário centralizado e footer “O bom pode ser melhor.”. Removidos: Resultados em produção, bloco de investimento e header.
+
+**Card de indicadores** (`src/metrics.ts`): troca a cada 4,8 s, pausa com mouse/foco/botão e não roda sozinho com `prefers-reduced-motion`. Os seis indicadores também estão em lista para leitores de tela.
+
+**Logos** em `public/assets/logos/`, exibidos em escala de cinza para manter a paleta. Dois aparecem sem nome, por escolha do proprietário.
+
+**Eventos novos:** `hero_metric_select`, `announcement_click`, `team_view`. Saíram `journey_click`, `hero_results_cta_click`, `case_view` e `investment_view`, porque os elementos não existem mais.
