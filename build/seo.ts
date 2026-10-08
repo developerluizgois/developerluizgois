@@ -28,8 +28,10 @@ const services = [
   ['Agentes de IA', 'Agentes de IA treinados com a dinâmica do negócio, que mostram onde agir primeiro.'],
 ] as const;
 
-// The social image's real pixel size; keep in sync if the file changes.
-const ogImage = { path: 'assets/luiz-gois-og.jpg', width: 969, height: 1200, type: 'image/jpeg' };
+// Real pixel sizes; keep in sync if the files change. The 1200×630 card is for link previews;
+// the portrait stays as the Person image, where Google expects a photo of the person.
+const ogImage = { path: 'assets/luiz-gois-social.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'Luiz Gois: mais usuários ativando, pagando e ficando. Growth e engenharia de produto para SaaS.' };
+const portrait = 'assets/luiz-gois-og.jpg';
 
 export function seoPlugin(siteUrl?: string): Plugin {
   const url = publicSiteUrl(siteUrl);
@@ -49,13 +51,13 @@ export function seoPlugin(siteUrl?: string): Plugin {
         { tag: 'meta', attrs: { property: 'og:image:width', content: String(ogImage.width) }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image:height', content: String(ogImage.height) }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image:type', content: ogImage.type }, injectTo: 'head' },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Retrato de Luiz Gois, engenheiro de produto e growth' }, injectTo: 'head' },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: ogImage.alt }, injectTo: 'head' },
         { tag: 'meta', attrs: { name: 'twitter:image', content: image }, injectTo: 'head' },
-        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: 'Retrato de Luiz Gois' }, injectTo: 'head' },
+        { tag: 'meta', attrs: { name: 'twitter:image:alt', content: ogImage.alt }, injectTo: 'head' },
         { tag: 'script', attrs: { type: 'application/ld+json' }, injectTo: 'head', children: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [
-            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image, jobTitle: 'Engenheiro de produto e growth', description: 'Engenheiro de produto e growth há mais de 6 anos, construindo ativação, conversão e retenção para empresas de software.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'],
+            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image: url + portrait, jobTitle: 'Engenheiro de produto e growth', description: 'Engenheiro de produto e growth há mais de 6 anos, construindo ativação, conversão e retenção para empresas de software.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'],
               knowsAbout: ['Engenharia de produto', 'Growth', 'Ativação de usuários', 'Onboarding', 'Conversão', 'Monetização', 'Retenção', 'Churn', 'Inteligência artificial', 'Automação de WhatsApp'],
               makesOffer: services.map(([name, description]) => ({ '@type': 'Offer', areaServed: { '@type': 'Country', name: 'Brasil' }, itemOffered: { '@type': 'Service', name, description, provider: { '@id': url + '#luiz' } } })) },
             { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois', alternateName: 'luizgois.com', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
