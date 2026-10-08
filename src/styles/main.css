@@ -97,7 +97,6 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .hero-lead { max-width: 540px; margin: clamp(24px, 4vh, 36px) 0 clamp(28px, 4.5vh, 44px); font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; color: var(--on-navy-muted); }
 .hero .button { min-height: 48px; padding: 12px 22px; border-radius: 6px; font-size: 15px; }
 .hero-actions { display: grid; justify-items: start; gap: 14px; }
-.hero-note { font-size: 14px; line-height: 1.5; color: var(--on-navy-muted); }
 
 .metrics { grid-column: 8 / span 5; display: grid; justify-items: center; gap: 18px; }
 .metric-card { position: relative; width: min(100%, 440px); aspect-ratio: 1 / 1; }

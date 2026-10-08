@@ -5,7 +5,7 @@ import { setScrollLocked } from './scroll';
 
 export type FormState = 'idle' | 'submitting' | 'success' | 'error';
 const errorMessage = 'Não foi possível enviar sua solicitação. Seus dados foram mantidos. Tente novamente.';
-const submitLabel = 'Enviar contexto';
+const submitLabel = 'Enviar';
 
 // A small submission gate also makes duplicate-click behavior testable without a browser.
 export function createSubmission(fetcher: typeof fetch = fetch) {

@@ -1,16 +1,16 @@
 import { trackEvent } from './analytics';
 
 const metrics = [
-  { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
-  { id: 'conversao', label: 'Conversão', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
-  { id: 'engajamento', label: 'Engajamento', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
-  { id: 'relacionamento', label: 'Relacionamento', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
-  { id: 'ia', label: 'Inteligência artificial', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
-  { id: 'checkout', label: 'Checkout', value: '−12%', aux: 'de carrinhos abandonados' },
+  { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento, com priorização e recuperação de leads' },
+  { id: 'conversao', label: 'Conversão', value: '<1% → 3%', aux: 'dos novos usuários ativando, com signup e onboarding redesenhados' },
+  { id: 'engajamento', label: 'Engajamento', value: '+53%', aux: 'no uso das funcionalidades principais do produto' },
+  { id: 'relacionamento', label: 'Relacionamento', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp automatizados' },
+  { id: 'ia', label: 'Inteligência artificial', value: '+3 mil', aux: 'análises feitas por agentes de IA, sem trabalho manual' },
+  { id: 'abandono', label: 'Abandono', value: '−12%', aux: 'de desistências no checkout' },
 ] as const;
 const INTERVAL = 4800;
 
-// Rotating card of real project results in the hero. The same data is listed for screen readers, so the rotation is visual only.
+// Rotating card of results the work can reach, kept generic so no client is named. The same data is listed for screen readers, so the rotation is visual only.
 export function initMetrics(): void {
   const root = document.querySelector<HTMLElement>('[data-metrics]');
   if (!root) return;
