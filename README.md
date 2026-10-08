@@ -137,7 +137,7 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 ## SEO e medição em produção
 
-O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Engenharia de produto e growth para software**. O build normal de produção gera:
+O domínio principal é **https://luizgois.com/**. O título é **Growth e engenharia de produto para SaaS | Luiz Gois**. O build normal de produção gera:
 
 - Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph (com largura, altura e tipo da imagem) e Twitter Card com o retrato de Luiz. `apple-touch-icon.png` (180 px) para atalhos no iOS.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
