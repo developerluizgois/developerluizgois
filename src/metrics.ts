@@ -1,16 +1,16 @@
 import { trackEvent } from './analytics';
 
 const metrics = [
-  { label: 'Aquisição', value: '+10–30%', aux: 'mais usuários entrando no produto' },
-  { label: 'Ativação', value: '+10–30%', aux: 'mais usuários chegando ao primeiro valor' },
-  { label: 'Engajamento', value: '+10–30%', aux: 'mais uso das ações que movem o produto' },
-  { label: 'Conversão', value: '+10–25%', aux: 'mais usuários virando receita' },
-  { label: 'Retenção', value: '+10–30%', aux: 'mais usuários permanecendo ativos' },
-  { label: 'Churn', value: '−10–30%', aux: 'menos clientes deixando o produto' },
+  { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
+  { id: 'conversao', label: 'Conversão', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
+  { id: 'engajamento', label: 'Engajamento', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
+  { id: 'relacionamento', label: 'Relacionamento', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
+  { id: 'ia', label: 'Inteligência artificial', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
+  { id: 'checkout', label: 'Checkout', value: '−12%', aux: 'de carrinhos abandonados' },
 ] as const;
 const INTERVAL = 4800;
 
-// Rotating card in the hero. The same data is listed for screen readers, so the rotation is visual only.
+// Rotating card of real project results in the hero. The same data is listed for screen readers, so the rotation is visual only.
 export function initMetrics(): void {
   const root = document.querySelector<HTMLElement>('[data-metrics]');
   if (!root) return;
@@ -61,13 +61,13 @@ export function initMetrics(): void {
   function setPaused(next: boolean): void {
     paused = next;
     pause.setAttribute('aria-pressed', String(paused));
-    pause.setAttribute('aria-label', paused ? 'Retomar troca automática de indicadores' : 'Pausar troca automática de indicadores');
+    pause.setAttribute('aria-label', paused ? 'Retomar troca automática de resultados' : 'Pausar troca automática de resultados');
     schedule();
   }
 
   tabs.forEach((tab, i) => tab.addEventListener('click', () => {
     show(i);
-    trackEvent('hero_metric_select', { content_id: metrics[i]!.label.toLowerCase() });
+    trackEvent('hero_metric_select', { content_id: metrics[i]!.id });
     schedule();
   }));
   pause.addEventListener('click', () => setPaused(!paused));

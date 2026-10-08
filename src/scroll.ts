@@ -20,6 +20,12 @@ export function scrollToSection(target: HTMLElement, onDone?: () => void): void 
   }
 }
 
+// Freezes the page behind a modal; Lenis must pause too or it keeps scrolling underneath.
+export function setScrollLocked(locked: boolean): void {
+  if (locked) lenis?.stop(); else lenis?.start();
+  document.documentElement.classList.toggle('is-locked', locked);
+}
+
 export function initAnchorLinks(): void {
   document.addEventListener('click', event => {
     const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
