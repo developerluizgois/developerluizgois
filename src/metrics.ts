@@ -1,12 +1,12 @@
 import { trackEvent } from './analytics';
 
 const metrics = [
-  { id: 'receita-leads2b', label: 'Receita · Leads2b', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
-  { id: 'conversao-woke', label: 'Conversão · Woke', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
-  { id: 'engajamento-woke', label: 'Engajamento · Woke', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
-  { id: 'compras-shop2gether', label: 'Compras · Shop2gether', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
-  { id: 'ia-woke', label: 'Escala com IA · Woke', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
-  { id: 'abandono-shop2gether', label: 'Abandono · Shop2gether', value: '−12%', aux: 'de carrinhos abandonados' },
+  { id: 'receita-saas-vendas', label: 'Receita · SaaS de vendas', value: '+30%', aux: 'no faturamento médio, com priorização e recuperação de leads' },
+  { id: 'conversao-plataforma-carreira', label: 'Conversão · plataforma de carreira', value: '<1% → 3%', aux: 'dos novos usuários, após refazer signup e onboarding' },
+  { id: 'engajamento-plataforma-carreira', label: 'Engajamento · plataforma de carreira', value: '+53%', aux: 'em ações sobre oportunidades, com o board de candidaturas' },
+  { id: 'compras-ecommerce', label: 'Compras · e-commerce', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
+  { id: 'ia-plataforma-recrutamento', label: 'IA · plataforma de recrutamento', value: '+3 mil', aux: 'entrevistas analisadas por agentes de IA' },
+  { id: 'abandono-ecommerce', label: 'Abandono · e-commerce', value: '−12%', aux: 'de carrinhos abandonados' },
 ] as const;
 const INTERVAL = 4800;
 
