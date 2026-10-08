@@ -40,7 +40,8 @@ async function notion(path: string, method: 'POST' | 'PATCH', body: unknown, con
       headers: { Authorization: `Bearer ${config.NOTION_TOKEN}`, 'Notion-Version': NOTION_VERSION, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal,
-      redirect: 'error',
+      // Workers only accept 'follow' or 'manual'; a redirect then fails as a non-2xx response.
+      redirect: 'manual',
     });
     // No provider bodies, personal data, IDs or credentials enter logs/errors.
     if (!response.ok) throw Object.assign(new NotionError(response.status === 429 ? 503 : 502, 'upstream_rejected', response.status), { step });
