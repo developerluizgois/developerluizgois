@@ -253,7 +253,7 @@ Validação: TypeScript, 52 testes e build passaram. Não existe script de lint 
 
 ## Nova estrutura (8 de outubro de 2026)
 
-Sem header. A primeira tela é sempre o hero navy, em três zonas: texto e CTA (“Quero mudar meu cenário” → `#contato`), card de indicadores rotativo e, embaixo, “Projetos realizados com” + anúncio para `https://mentor.wokepeople.com/` com `utm_source=luizgois.com`, `utm_medium=referral`, `utm_campaign=luizgois_site`, `utm_content=hero_announcement`. (`www.mentor.wokepeople.com` não resolve no DNS.)
+Sem header. A primeira tela é sempre o hero navy, em três zonas: texto e CTA (“Quero mudar meu cenário” → `#contato`), card de indicadores rotativo e, embaixo, “Projetos realizados com” + anúncio para `https://mentor.wokepeople.com/signup` com `utm_source=luizgois.com`, `utm_medium=referral`, `utm_campaign=luizgois_site`, `utm_content=hero_announcement`. (`www.mentor.wokepeople.com` não resolve no DNS.)
 
 Seções: Minha expertise (altura de tela, cinco cards), Como eu trabalho (quatro etapas, palco sticky no desktop), Quem está por trás (altura de tela), formulário centralizado e footer “O bom pode ser melhor.”. Removidos: Resultados em produção, bloco de investimento e header.
 
