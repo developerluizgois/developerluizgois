@@ -26,3 +26,5 @@ do {
   cursor = page.has_more ? page.next_cursor : undefined;
 } while (cursor);
 if (!found) console.log('Nenhuma pessoa visível para a integração.');
+
+export {};
