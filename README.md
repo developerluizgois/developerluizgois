@@ -134,15 +134,15 @@ Referências: [Cloudflare Vite](https://developers.cloudflare.com/workers/vite-p
 
 ## SEO e medição em produção
 
-O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Software, Produto e IA aplicada a resultado**. O build normal de produção gera:
+O domínio principal é **https://luizgois.com/**. O título é **Luiz Gois — Engenharia de produto e growth para software**. O build normal de produção gera:
 
-- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph e Twitter Card com o retrato de Luiz.
+- Descrição de busca, idioma pt-BR, título e descrição para compartilhamento, Open Graph (com largura, altura e tipo da imagem) e Twitter Card com o retrato de Luiz. `apple-touch-icon.png` (180 px) para atalhos no iOS.
 - Canonical absoluto e `og:url` apontando para a raiz, sem parâmetros UTM nem fragmentos das seções.
-- JSON-LD com Person, WebSite e WebPage, nome, serviços descritos, retrato e perfis sociais reais. Não inclui números ilustrativos, avaliações ou resultados inventados.
+- JSON-LD com Person (com `knowsAbout` e os seis serviços dos painéis em `makesOffer`), WebSite, WebPage e FAQPage, retrato e perfis sociais reais. O FAQPage é lido do próprio HTML no build (`faqFromHtml`), então editar uma pergunta na página atualiza os dados estruturados. Ao mudar um serviço nos painéis, atualize a lista `services` em `build/seo.ts`. Não inclui números ilustrativos, avaliações ou resultados inventados.
 - `robots.txt` permitindo rastreamento da landing e informando o sitemap; `/api/` fica fora do rastreamento.
 - `sitemap.xml` contendo apenas a página canônica. Não há datas de atualização fictícias nem URLs separadas para cada seção.
 - Conteúdo e metadados no HTML entregue pelo servidor, sem depender da execução de JavaScript pelo buscador. Um H1, títulos de seção, formulário com labels e retrato com dimensões e texto alternativo.
-- Fonte local com preload; CSS/JS versionados pelo Vite. O retrato continua lazy loaded. O componente de exemplos fictícios foi removido. O mosaico usa apenas os resultados fornecidos por Luiz; o texto final está no HTML antes da animação.
+- Fonte local com preload; CSS/JS versionados pelo Vite. `public/_headers` faz cache de 1 ano (`immutable`) nos bundles com hash e de 1 semana nas imagens, fonte e ícones; o HTML continua sempre revalidado. O retrato continua lazy loaded. O componente de exemplos fictícios foi removido. O mosaico usa apenas os resultados fornecidos por Luiz; o texto final está no HTML antes da animação.
 - URLs inexistentes não usam fallback de SPA (`not_found_handling: none`), evitando páginas desconhecidas respondendo com a landing e status 200.
 
 A variável **de build** `SITE_URL` pode substituir o domínio, se necessário. Não é secret nem configuração do frontend em runtime. O padrão de produção já é `https://luizgois.com/`. `npm run dev` e builds com `--mode staging` geram `noindex, nofollow`, sem canonical/sitemap de produção. Use modo staging nas previews públicas. Não publique um build staging no domínio principal. Alterar o domínio exige rebuild.
