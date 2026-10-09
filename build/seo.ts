@@ -28,7 +28,7 @@ const services = [
 
 // Real pixel sizes; keep in sync if the files change. The 1200×630 card is for link previews;
 // the portrait stays as the Person image, where Google expects a photo of the person.
-const ogImage = { path: 'assets/luiz-gois-social.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'Luiz Gois: mais usuários ativando, pagando e ficando. Growth e engenharia de produto para SaaS.' };
+const ogImage = { path: 'assets/luiz-gois-social.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'Luiz Gois: Produto, Growth & Engenharia para quem faz diferente.' };
 const portrait = 'assets/luiz-gois-og.jpg';
 
 export function seoPlugin(siteUrl?: string): Plugin {
@@ -59,7 +59,7 @@ export function seoPlugin(siteUrl?: string): Plugin {
               knowsAbout: ['Engenharia de produto', 'Growth', 'Ativação de usuários', 'Onboarding', 'Conversão', 'Monetização', 'Retenção', 'Churn', 'Inteligência artificial', 'Automação de WhatsApp'],
               makesOffer: services.map(([name, description]) => ({ '@type': 'Offer', areaServed: { '@type': 'Country', name: 'Brasil' }, itemOffered: { '@type': 'Service', name, description, provider: { '@id': url + '#luiz' } } })) },
             { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois', alternateName: 'luizgois.com', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Growth e engenharia de produto para SaaS | Luiz Gois', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, primaryImageOfPage: { '@type': 'ImageObject', url: image, width: ogImage.width, height: ogImage.height }, description: 'Growth e engenharia de produto para SaaS: encontro onde seu software perde usuários, do cadastro à renovação, e construo as melhorias com seu time.' },
+            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Produto, Growth & Engenharia para quem faz diferente | Luiz Gois', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, primaryImageOfPage: { '@type': 'ImageObject', url: image, width: ogImage.width, height: ogImage.height }, description: 'Growth e engenharia de produto para SaaS: encontro onde seu software perde usuários, do cadastro à renovação, e construo as melhorias com seu time.' },
             ...(faq.length ? [{ '@type': 'FAQPage', '@id': url + '#perguntas', url: url + '#perguntas', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#webpage' }, mainEntity: faq.map(({ question, answer }) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) }] : []),
           ],
         }).replace(/</g, '\\u003c') },

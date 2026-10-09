@@ -92,7 +92,6 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .hero-top { padding-bottom: clamp(40px, 7vh, 80px); }
 .hero-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: center; }
 .hero-copy { grid-column: 1 / span 7; }
-.hero-eyebrow { margin-bottom: clamp(16px, 3vh, 28px); letter-spacing: .22em; color: var(--on-navy-muted); }
 .hero h1 { font-family: var(--display); font-size: clamp(44px, 5.2vw, 84px); line-height: 1.02; letter-spacing: -.045em; }
 .hero h1 em { display: block; color: var(--accent); }
 .hero-lead { max-width: 540px; margin: clamp(24px, 4vh, 36px) 0 clamp(28px, 4.5vh, 44px); font-size: clamp(17px, 1.35vw, 20px); line-height: 1.55; color: var(--on-navy-muted); }
@@ -364,7 +363,6 @@ html.is-locked { overflow: hidden; }
   .motion-ready .hero-copy > * { opacity: 0; transform: translateY(14px); animation: rise .6s var(--ease) forwards; }
   .motion-ready .hero-copy > :nth-child(2) { animation-delay: .12s; }
   .motion-ready .hero-copy > :nth-child(3) { animation-delay: .22s; }
-  .motion-ready .hero-copy > :nth-child(4) { animation-delay: .32s; }
   .motion-ready .metric-card { opacity: 0; transform: translateY(18px); animation: rise .7s var(--ease) .3s forwards; }
   .motion-ready .hero-foot > * { opacity: 0; animation: fade .6s var(--ease) .55s forwards; }
 
