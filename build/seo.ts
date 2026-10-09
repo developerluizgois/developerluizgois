@@ -28,7 +28,7 @@ const services = [
 
 // Real pixel sizes; keep in sync if the files change. The 1200×630 card is for link previews;
 // the portrait stays as the Person image, where Google expects a photo of the person.
-const ogImage = { path: 'assets/luiz-gois-social.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'Luiz Gois: Produto, Growth & Engenharia para quem faz diferente.' };
+const ogImage = { path: 'assets/luiz-gois-social.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'Luiz Gois: Seu software, com uma experiência que vende.' };
 const portrait = 'assets/luiz-gois-og.jpg';
 
 export function seoPlugin(siteUrl?: string): Plugin {
