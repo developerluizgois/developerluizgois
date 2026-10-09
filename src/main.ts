@@ -1,7 +1,6 @@
 import './styles/main.css';
 import { initConsent } from './consent';
 import { initContactForm } from './contact';
-import { initMetrics } from './metrics';
 import { initRail } from './rail';
 import { initProcess } from './process';
 import { initMotion } from './motion';
@@ -15,7 +14,6 @@ initSmoothScroll();
 initAnchorLinks();
 initMotion();
 initContactForm();
-initMetrics();
 initRail();
 initProcess();
 initScrollDepth();
