@@ -151,6 +151,15 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 @keyframes pulse { 0% { transform: scale(1); opacity: .7; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
 
 /* 2 · Minha expertise — screen-height rail. */
+.pain, .value { background: var(--white); color: var(--ink); }
+.pain-copy, .value-wrap { max-width: calc(760px + 2 * var(--gutter)); display: grid; gap: 20px; }
+.pain-copy p { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.55; color: var(--muted); }
+.pain-copy .pain-close { margin-top: 12px; font-family: var(--display); font-size: clamp(24px, 2.4vw, 34px); line-height: 1.2; letter-spacing: -.02em; color: var(--ink); }
+.value-list { border-bottom: 1px solid var(--line); }
+.value-list > div { display: grid; gap: 8px; padding: 22px 0; border-top: 1px solid var(--line); }
+.value-list dt { font-family: var(--display); font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; letter-spacing: -.02em; }
+.value-list dd { font-size: 16px; line-height: 1.6; color: var(--muted); }
+@media (min-width: 900px) { .value-list > div { grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; } }
 .where { background: var(--paper); }
 .rail { position: relative; flex: 1; display: flex; min-height: 0; }
 .rail-track {
