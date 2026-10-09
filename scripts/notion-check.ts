@@ -18,7 +18,7 @@ const lead = {
   name: 'TESTE CLAUDE (pode apagar)',
   email: 'teste-claude@example.com',
   companyOrProduct: 'exemplo.test',
-  challengeType: 'Retenção e churn' as const,
+  challengeType: 'Ficar: perder menos clientes' as const,
   investmentRange: 'R$ 25 mil a R$ 50 mil' as const,
   challenge: 'Teste do fluxo de contatos rodado pelo script notion:check.',
   consent: true as const,

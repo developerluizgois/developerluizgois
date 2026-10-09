@@ -54,7 +54,7 @@ const notionBodies = (api: ReturnType<typeof fakeApis>) => api.mock.calls
 
 describe('lead scoring', () => {
   it('weights the visitor budget and the rule signals into a provisional score', () => {
-    const strong = { ...lead, email: 'ana@acme.com', companyOrProduct: 'acme.com', challengeType: 'Retenção e churn' as const, investmentRange: 'Acima de R$ 50 mil' as const, challenge: 'x'.repeat(320) };
+    const strong = { ...lead, email: 'ana@acme.com', companyOrProduct: 'acme.com', challengeType: 'Ficar: perder menos clientes' as const, investmentRange: 'Acima de R$ 50 mil' as const, challenge: 'x'.repeat(320) };
     const weak = { ...lead, email: 'ana@gmail.com', investmentRange: 'Até R$ 10 mil' as const };
     expect(provisionalScore(strong)).toBe(35 + 25 + 10 + 11);
     expect(tierFor(provisionalScore(strong))).toBe('A');
@@ -72,7 +72,7 @@ describe('lead scoring', () => {
 describe('Notion records without external calls', () => {
   it('creates the lead with every field, owner and provisional class', async () => {
     const api = fakeApis();
-    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Aquisição e landing page', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
+    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Entender: site e landing page', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
     expect(await createLeadPage(qualified, 72, config, receivedAt, api)).toBe('page-1');
     const [call] = notionBodies(api);
     expect(call!.url).toBe('https://api.notion.com/v1/pages');
@@ -84,7 +84,7 @@ describe('Notion records without external calls', () => {
       Classe: { select: { name: 'A' } }, Nota: { number: 72 }, Status: { status: { name: 'Novo' } },
       Responsável: { people: [{ object: 'user', id: 'owner-1' }] },
       Email: { email: lead.email }, WhatsApp: { phone_number: '+5548999999999' }, 'Responder por': { select: { name: 'WhatsApp' } },
-      'Tipo de desafio': { select: { name: 'Aquisição e landing page' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
+      'Tipo de desafio': { select: { name: 'Entender: site e landing page' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
       Análise: { select: { name: 'Pendente' } }, Origem: { rich_text: [{ type: 'text', text: { content: 'utm_source: linkedin' } }] },
       Consentimento: { checkbox: true }, 'Recebido em': { date: { start: receivedAt.toISOString() } },
     });
@@ -113,7 +113,7 @@ describe('Notion records without external calls', () => {
 describe('AI assessment', () => {
   it('sends only the business context to the model and returns capped text', async () => {
     const api = fakeApis({ assessment: { fit: 20, urgency: 10, clarity: 9, reason: 'r'.repeat(500), first_question: 'Qual é o churn?' } });
-    const result = await assessLead({ ...lead, whatsapp: '+5548999999999', challengeType: 'Retenção e churn' }, 'unit-test-key', api);
+    const result = await assessLead({ ...lead, whatsapp: '+5548999999999', challengeType: 'Ficar: perder menos clientes' }, 'unit-test-key', api);
     expect(result).toMatchObject({ fit: 20, urgency: 10, clarity: 9, firstQuestion: 'Qual é o churn?' });
     expect(result.reason).toHaveLength(300);
     const request = api.mock.calls.find(([input]) => String(input instanceof Request ? input.url : input).startsWith('https://api.anthropic.com/'))!;

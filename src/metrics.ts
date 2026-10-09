@@ -2,11 +2,11 @@ import { trackEvent } from './analytics';
 
 const metrics = [
   { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento, com priorização e recuperação de leads' },
-  { id: 'conversao', label: 'Conversão', value: '<1% → 3%', aux: 'dos novos usuários ativando, com signup e onboarding redesenhados' },
-  { id: 'engajamento', label: 'Engajamento', value: '+53%', aux: 'no uso das funcionalidades principais do produto' },
-  { id: 'relacionamento', label: 'Relacionamento', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp automatizados' },
-  { id: 'ia', label: 'Inteligência artificial', value: '+3 mil', aux: 'análises feitas por agentes de IA, sem trabalho manual' },
-  { id: 'abandono', label: 'Abandono', value: '−12%', aux: 'de desistências no checkout' },
+  { id: 'conversao', label: 'Novos clientes', value: '<1% → 3%', aux: 'dos novos usuários chegando ao valor do produto' },
+  { id: 'engajamento', label: 'Uso', value: '+53%', aux: 'no uso do que mais importa no produto' },
+  { id: 'relacionamento', label: 'Compras', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
+  { id: 'ia', label: 'IA', value: '+3 mil', aux: 'análises feitas por IA, sem trabalho manual' },
+  { id: 'abandono', label: 'Desistências', value: '−12%', aux: 'na hora de pagar' },
 ] as const;
 const INTERVAL = 4800;
 

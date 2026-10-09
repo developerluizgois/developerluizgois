@@ -20,10 +20,10 @@ export function faqFromHtml(html: string): { question: string; answer: string }[
 
 // Services as named on the page's capability panels; no prices, ratings or results.
 const services = [
-  ['Aquisição e landing page', 'Site e landing page que explicam o produto em segundos, para mais visitas virarem cadastro.'],
-  ['Ativação e onboarding', 'Análise de comportamento, UX e perfil de quem se cadastra, do signup ao onboarding, para mais usuários chegarem ao primeiro valor do produto.'],
-  ['Conversão e monetização', 'Correção das fricções que impedem o lead de converter, follow-up com IA no WhatsApp e estratégias de monetização para quem usa e ainda não paga.'],
-  ['Retenção e churn', 'Rotinas de comunicação in-app, por email e WhatsApp, a partir do comportamento de cada cliente, com um agente de IA que aponta quem está perto de cancelar.'],
+  ['Entender: site e landing page', 'Site e landing page que explicam o produto em segundos.'],
+  ['Usar: primeiros passos no produto', 'Primeiros passos redesenhados para cada pessoa chegar logo ao valor do produto.'],
+  ['Comprar: vender mais', 'Menos atrito na compra e dúvidas respondidas no WhatsApp com IA.'],
+  ['Ficar: perder menos clientes', 'Acompanhamento do uso de cada cliente, com IA avisando quem está perto de sair.'],
 ] as const;
 
 // Real pixel sizes; keep in sync if the files change. The 1200×630 card is for link previews;
