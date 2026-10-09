@@ -72,7 +72,7 @@ describe('lead scoring', () => {
 describe('Notion records without external calls', () => {
   it('creates the lead with every field, owner and provisional class', async () => {
     const api = fakeApis();
-    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Integrações e dados', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
+    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Aquisição e landing page', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
     expect(await createLeadPage(qualified, 72, config, receivedAt, api)).toBe('page-1');
     const [call] = notionBodies(api);
     expect(call!.url).toBe('https://api.notion.com/v1/pages');
@@ -84,7 +84,7 @@ describe('Notion records without external calls', () => {
       Classe: { select: { name: 'A' } }, Nota: { number: 72 }, Status: { status: { name: 'Novo' } },
       Responsável: { people: [{ object: 'user', id: 'owner-1' }] },
       Email: { email: lead.email }, WhatsApp: { phone_number: '+5548999999999' }, 'Responder por': { select: { name: 'WhatsApp' } },
-      'Tipo de desafio': { select: { name: 'Integrações e dados' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
+      'Tipo de desafio': { select: { name: 'Aquisição e landing page' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
       Análise: { select: { name: 'Pendente' } }, Origem: { rich_text: [{ type: 'text', text: { content: 'utm_source: linkedin' } }] },
       Consentimento: { checkbox: true }, 'Recebido em': { date: { start: receivedAt.toISOString() } },
     });
