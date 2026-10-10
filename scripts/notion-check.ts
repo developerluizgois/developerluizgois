@@ -1,8 +1,10 @@
 // Sends one labeled test lead through the same code the Worker uses and prints Notion's answer.
 // Run it yourself so the token never leaves your terminal:
 //   NOTION_TOKEN=... npm run notion:check
+// Add `-- --mentoria` to test the mentoring table instead.
 import { readFileSync } from 'node:fs';
 import { createLeadPage } from '../worker/notion.ts';
+import { mentorshipType, type LeadPayload } from '../shared/lead.ts';
 import { provisionalScore } from '../worker/scoring.ts';
 
 const token = process.env.NOTION_TOKEN?.trim();
@@ -10,16 +12,18 @@ if (!token) {
   console.error('Defina NOTION_TOKEN.');
   process.exit(1);
 }
-// wrangler.jsonc holds the two non-secret IDs; strip its line comments before parsing.
+// wrangler.jsonc holds the non-secret IDs; strip its line comments before parsing.
 const config = JSON.parse(readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8').replace(/^\s*\/\/.*$/gm, ''));
-const vars = config.vars as { NOTION_DATA_SOURCE_ID: string; NOTION_OWNER_ID: string };
+const vars = config.vars as { NOTION_DATA_SOURCE_ID: string; NOTION_MENTORSHIP_DATA_SOURCE_ID: string; NOTION_OWNER_ID: string };
+const mentorship = process.argv.includes('--mentoria');
 
-const lead = {
+const lead: LeadPayload = {
   name: 'TESTE CLAUDE (pode apagar)',
   email: 'teste-claude@example.com',
   companyOrProduct: 'exemplo.test',
-  challengeType: 'Ficar: perder menos clientes' as const,
-  investmentRange: 'R$ 25 mil a R$ 50 mil' as const,
+  ...(mentorship
+    ? { challengeType: mentorshipType }
+    : { challengeType: 'Ficar: perder menos clientes' as const, investmentRange: 'R$ 25 mil a R$ 50 mil' as const }),
   challenge: 'Teste do fluxo de contatos rodado pelo script notion:check.',
   consent: true as const,
 };

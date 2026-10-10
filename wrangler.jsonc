@@ -17,9 +17,10 @@
     "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": false }
   },
   // Secrets NOTION_TOKEN and ANTHROPIC_API_KEY are set with `wrangler secret put`, never here.
-  // These two IDs come from `npm run setup:notion` and are not secret.
+  // These IDs are not secret: the first and the owner come from `npm run setup:notion`; the mentoring table was created in Notion under CRM.
   "vars": {
     "NOTION_DATA_SOURCE_ID": "5e5f00c2-c99f-44c0-ad37-138453f514dc",
+    "NOTION_MENTORSHIP_DATA_SOURCE_ID": "05765fe6-ba65-465f-a302-9cb1505efd42",
     "NOTION_OWNER_ID": "242d872b-594c-8149-981d-0002b8fcedcb"
   }
 }

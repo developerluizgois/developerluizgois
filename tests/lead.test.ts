@@ -10,7 +10,7 @@ import { createSubmission } from '../src/contact';
 import type { FormState } from '../src/contact';
 
 const lead = { name: 'Maria Teste', email: 'maria@example.com', companyOrProduct: 'Produto teste', challenge: 'Quero melhorar a conversão do produto.', consent: true as const };
-const config = { NOTION_TOKEN: 'unit-test-only', NOTION_DATA_SOURCE_ID: 'source-1', NOTION_OWNER_ID: 'owner-1' };
+const config = { NOTION_TOKEN: 'unit-test-only', NOTION_DATA_SOURCE_ID: 'source-1', NOTION_MENTORSHIP_DATA_SOURCE_ID: 'mentorship-1', NOTION_OWNER_ID: 'owner-1' };
 const env = { ...config, ASSETS: { fetch: async () => new Response('asset') } };
 const receivedAt = new Date('2026-10-02T15:22:33.444Z');
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
@@ -89,6 +89,19 @@ describe('Notion records without external calls', () => {
       Consentimento: { checkbox: true }, 'Recebido em': { date: { start: receivedAt.toISOString() } },
     });
     expect(call!.body.children[0].paragraph.rich_text[0]).toEqual({ type: 'mention', mention: { type: 'user', user: { object: 'user', id: 'owner-1' } } });
+  });
+  it('sends mentoring requests to the mentoring table with its own field names', async () => {
+    const api = fakeApis();
+    await createLeadPage(validateLead({ ...lead, challengeType: mentorshipType }), 50, config, receivedAt, api);
+    const { body } = notionBodies(api)[0]!;
+    expect(body.parent).toEqual({ type: 'data_source_id', data_source_id: 'mentorship-1' });
+    expect(body.properties).toMatchObject({
+      Status: { select: { name: 'Novo' } },
+      'O que faz hoje': { rich_text: [{ type: 'text', text: { content: lead.companyOrProduct } }] },
+      Objetivo: { rich_text: [{ type: 'text', text: { content: lead.challenge } }] },
+    });
+    for (const name of ['Empresa', 'Desafio', 'Tipo de desafio', 'Investimento']) expect(body.properties).not.toHaveProperty(name);
+    await expect(createLeadPage(validateLead({ ...lead, challengeType: mentorshipType }), 50, { ...config, NOTION_MENTORSHIP_DATA_SOURCE_ID: '' }, receivedAt, fakeApis())).rejects.toMatchObject({ status: 503, step: 'configuration' });
   });
   it('splits long descriptions into 2,000-character pieces without cutting text', () => {
     const parts = richText('a'.repeat(4500));
