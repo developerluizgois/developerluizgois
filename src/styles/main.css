@@ -91,7 +91,7 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; background: var(--navy-950); color: var(--on-navy); padding-top: clamp(88px, 11vh, 120px); }
 .hero-top { padding-bottom: clamp(40px, 7vh, 80px); }
 /* Two-way switch between the company page and the mentorship page. */
-.audience { position: absolute; top: clamp(16px, 3vh, 28px); left: max(var(--gutter), calc((100% - var(--max)) / 2)); z-index: 2; display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--navy-900); }
+.audience { position: fixed; top: clamp(12px, 2.4vh, 20px); left: 50%; transform: translateX(-50%); z-index: 50; display: inline-flex; box-shadow: 0 6px 24px rgb(12 24 48 / .18); gap: 4px; padding: 4px; border-radius: 999px; background: var(--navy-900); }
 .audience a { padding: 9px 18px; border-radius: 999px; font-size: 14px; line-height: 1; color: var(--on-navy-muted); text-decoration: none; transition: color .2s, background-color .2s; }
 .audience a:hover { color: var(--on-navy); }
 .audience a[aria-current="page"] { background: var(--accent); color: var(--navy-950); }
