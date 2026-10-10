@@ -1,4 +1,4 @@
-import type { LeadPayload } from '../shared/lead';
+import { mentorshipType, type LeadPayload } from '../shared/lead';
 import { tierFor, type Assessment } from './scoring.ts';
 
 export const NOTION_VERSION = '2026-03-11';
@@ -6,6 +6,8 @@ export const NOTION_VERSION = '2026-03-11';
 export interface NotionConfig {
   NOTION_TOKEN?: string;
   NOTION_DATA_SOURCE_ID?: string;
+  // Mentoring requests from /mentoria go to their own table ("Contatos da mentoria").
+  NOTION_MENTORSHIP_DATA_SOURCE_ID?: string;
   NOTION_OWNER_ID?: string;
 }
 
@@ -59,31 +61,43 @@ function origin(lead: LeadPayload): string {
 }
 
 export async function createLeadPage(lead: LeadPayload, score: number, config: NotionConfig, receivedAt: Date, fetcher: typeof fetch = fetch): Promise<string> {
-  if (!config.NOTION_TOKEN || !config.NOTION_DATA_SOURCE_ID) throw Object.assign(new NotionError(503, 'configuration_missing'), { step: 'configuration' as const });
+  const mentorship = lead.challengeType === mentorshipType;
+  const dataSourceId = mentorship ? config.NOTION_MENTORSHIP_DATA_SOURCE_ID : config.NOTION_DATA_SOURCE_ID;
+  if (!config.NOTION_TOKEN || !dataSourceId) throw Object.assign(new NotionError(503, 'configuration_missing'), { step: 'configuration' as const });
   const owner = config.NOTION_OWNER_ID ? [{ object: 'user', id: config.NOTION_OWNER_ID }] : [];
   const source = origin(lead);
-  const page = await notion('/pages', 'POST', {
-    parent: { type: 'data_source_id', data_source_id: config.NOTION_DATA_SOURCE_ID },
-    properties: {
-      Nome: { title: richText(lead.name) },
-      Classe: { select: { name: tierFor(score) } },
-      Nota: { number: score },
+  // The mentoring table names the free-text fields for a person, not a company, and has no challenge type or budget.
+  const details = mentorship
+    ? {
+      Status: { select: { name: 'Novo' } },
+      'O que faz hoje': { rich_text: richText(lead.companyOrProduct) },
+      Objetivo: { rich_text: richText(lead.challenge) },
+    }
+    : {
       Status: { status: { name: 'Novo' } },
-      Responsável: { people: owner },
-      Email: { email: lead.email },
-      ...(lead.whatsapp ? { WhatsApp: { phone_number: lead.whatsapp } } : {}),
-      'Responder por': { select: { name: lead.contactPreference === 'whatsapp' ? 'WhatsApp' : 'Email' } },
       Empresa: { rich_text: richText(lead.companyOrProduct) },
       ...(lead.challengeType ? { 'Tipo de desafio': { select: { name: lead.challengeType } } } : {}),
       ...(lead.investmentRange ? { Investimento: { select: { name: lead.investmentRange } } } : {}),
       Desafio: { rich_text: richText(lead.challenge) },
+    };
+  const page = await notion('/pages', 'POST', {
+    parent: { type: 'data_source_id', data_source_id: dataSourceId },
+    properties: {
+      Nome: { title: richText(lead.name) },
+      Classe: { select: { name: tierFor(score) } },
+      Nota: { number: score },
+      Responsável: { people: owner },
+      Email: { email: lead.email },
+      ...(lead.whatsapp ? { WhatsApp: { phone_number: lead.whatsapp } } : {}),
+      'Responder por': { select: { name: lead.contactPreference === 'whatsapp' ? 'WhatsApp' : 'Email' } },
+      ...details,
       Análise: { select: { name: 'Pendente' } },
       ...(source ? { Origem: { rich_text: richText(source) } } : {}),
       Consentimento: { checkbox: true },
       'Recebido em': { date: { start: receivedAt.toISOString() } },
     },
     // A mention in the page body is what makes Notion notify the owner right away.
-    ...(owner.length ? { children: [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'mention', mention: { type: 'user', user: owner[0] } }, { type: 'text', text: { content: ' novo contato pelo site.' } }] } }] } : {}),
+    ...(owner.length ? { children: [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'mention', mention: { type: 'user', user: owner[0] } }, { type: 'text', text: { content: mentorship ? ' novo pedido de mentoria pelo site.' : ' novo contato pelo site.' } }] } }] } : {}),
   }, config, 'page_create', fetcher);
   if (typeof page.id !== 'string' || !page.id) throw Object.assign(new NotionError(502, 'invalid_response'), { step: 'page_create' as const });
   return page.id;

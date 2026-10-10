@@ -5,12 +5,12 @@ import { createLeadPage, richText, NOTION_VERSION } from '../worker/notion';
 import { assessLead } from '../worker/assessment';
 import { finalScore, provisionalScore, tierFor } from '../worker/scoring';
 import worker, { enrichLead } from '../worker/index';
-import { challengeTypes, investmentRanges } from '../shared/lead';
+import { challengeTypes, investmentRanges, mentorshipType } from '../shared/lead';
 import { createSubmission } from '../src/contact';
 import type { FormState } from '../src/contact';
 
 const lead = { name: 'Maria Teste', email: 'maria@example.com', companyOrProduct: 'Produto teste', challenge: 'Quero melhorar a conversão do produto.', consent: true as const };
-const config = { NOTION_TOKEN: 'unit-test-only', NOTION_DATA_SOURCE_ID: 'source-1', NOTION_OWNER_ID: 'owner-1' };
+const config = { NOTION_TOKEN: 'unit-test-only', NOTION_DATA_SOURCE_ID: 'source-1', NOTION_MENTORSHIP_DATA_SOURCE_ID: 'mentorship-1', NOTION_OWNER_ID: 'owner-1' };
 const env = { ...config, ASSETS: { fetch: async () => new Response('asset') } };
 const receivedAt = new Date('2026-10-02T15:22:33.444Z');
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
@@ -54,7 +54,7 @@ const notionBodies = (api: ReturnType<typeof fakeApis>) => api.mock.calls
 
 describe('lead scoring', () => {
   it('weights the visitor budget and the rule signals into a provisional score', () => {
-    const strong = { ...lead, email: 'ana@acme.com', companyOrProduct: 'acme.com', challengeType: 'Retenção e churn' as const, investmentRange: 'Acima de R$ 50 mil' as const, challenge: 'x'.repeat(320) };
+    const strong = { ...lead, email: 'ana@acme.com', companyOrProduct: 'acme.com', challengeType: 'Ficar: perder menos clientes' as const, investmentRange: 'Acima de R$ 50 mil' as const, challenge: 'x'.repeat(320) };
     const weak = { ...lead, email: 'ana@gmail.com', investmentRange: 'Até R$ 10 mil' as const };
     expect(provisionalScore(strong)).toBe(35 + 25 + 10 + 11);
     expect(tierFor(provisionalScore(strong))).toBe('A');
@@ -72,7 +72,7 @@ describe('lead scoring', () => {
 describe('Notion records without external calls', () => {
   it('creates the lead with every field, owner and provisional class', async () => {
     const api = fakeApis();
-    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Integrações e dados', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
+    const qualified = validateLead({ ...lead, whatsapp: '+55 48 99999-9999', contactPreference: 'whatsapp', challengeType: 'Entender: site e landing page', investmentRange: 'Até R$ 10 mil', attribution: { utm_source: 'linkedin' } });
     expect(await createLeadPage(qualified, 72, config, receivedAt, api)).toBe('page-1');
     const [call] = notionBodies(api);
     expect(call!.url).toBe('https://api.notion.com/v1/pages');
@@ -84,11 +84,24 @@ describe('Notion records without external calls', () => {
       Classe: { select: { name: 'A' } }, Nota: { number: 72 }, Status: { status: { name: 'Novo' } },
       Responsável: { people: [{ object: 'user', id: 'owner-1' }] },
       Email: { email: lead.email }, WhatsApp: { phone_number: '+5548999999999' }, 'Responder por': { select: { name: 'WhatsApp' } },
-      'Tipo de desafio': { select: { name: 'Integrações e dados' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
+      'Tipo de desafio': { select: { name: 'Entender: site e landing page' } }, Investimento: { select: { name: 'Até R$ 10 mil' } },
       Análise: { select: { name: 'Pendente' } }, Origem: { rich_text: [{ type: 'text', text: { content: 'utm_source: linkedin' } }] },
       Consentimento: { checkbox: true }, 'Recebido em': { date: { start: receivedAt.toISOString() } },
     });
     expect(call!.body.children[0].paragraph.rich_text[0]).toEqual({ type: 'mention', mention: { type: 'user', user: { object: 'user', id: 'owner-1' } } });
+  });
+  it('sends mentoring requests to the mentoring table with its own field names', async () => {
+    const api = fakeApis();
+    await createLeadPage(validateLead({ ...lead, challengeType: mentorshipType }), 50, config, receivedAt, api);
+    const { body } = notionBodies(api)[0]!;
+    expect(body.parent).toEqual({ type: 'data_source_id', data_source_id: 'mentorship-1' });
+    expect(body.properties).toMatchObject({
+      Status: { select: { name: 'Novo' } },
+      'O que faz hoje': { rich_text: [{ type: 'text', text: { content: lead.companyOrProduct } }] },
+      Objetivo: { rich_text: [{ type: 'text', text: { content: lead.challenge } }] },
+    });
+    for (const name of ['Empresa', 'Desafio', 'Tipo de desafio', 'Investimento']) expect(body.properties).not.toHaveProperty(name);
+    await expect(createLeadPage(validateLead({ ...lead, challengeType: mentorshipType }), 50, { ...config, NOTION_MENTORSHIP_DATA_SOURCE_ID: '' }, receivedAt, fakeApis())).rejects.toMatchObject({ status: 503, step: 'configuration' });
   });
   it('splits long descriptions into 2,000-character pieces without cutting text', () => {
     const parts = richText('a'.repeat(4500));
@@ -113,7 +126,7 @@ describe('Notion records without external calls', () => {
 describe('AI assessment', () => {
   it('sends only the business context to the model and returns capped text', async () => {
     const api = fakeApis({ assessment: { fit: 20, urgency: 10, clarity: 9, reason: 'r'.repeat(500), first_question: 'Qual é o churn?' } });
-    const result = await assessLead({ ...lead, whatsapp: '+5548999999999', challengeType: 'Retenção e churn' }, 'unit-test-key', api);
+    const result = await assessLead({ ...lead, whatsapp: '+5548999999999', challengeType: 'Ficar: perder menos clientes' }, 'unit-test-key', api);
     expect(result).toMatchObject({ fit: 20, urgency: 10, clarity: 9, firstQuestion: 'Qual é o churn?' });
     expect(result.reason).toHaveLength(300);
     const request = api.mock.calls.find(([input]) => String(input instanceof Request ? input.url : input).startsWith('https://api.anthropic.com/'))!;
@@ -247,5 +260,15 @@ describe('qualification and attribution', () => {
     vi.stubGlobal('window', { dataLayer: [] });
     expect(await createSubmission(vi.fn<typeof fetch>(fetcher))(lead, () => {})).toBe(false);
     expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_error', 'contact_form_error'].map(event => ({ event, form_provider: 'notion' })));
+  });
+});
+
+describe('mentorship page', () => {
+  it('sends the mentorship type as a hidden field the server accepts', () => {
+    const html = readFileSync(new URL('../mentoria/index.html', import.meta.url), 'utf8');
+    expect(html).toContain(`<input type="hidden" name="challengeType" value="${mentorshipType}">`);
+    expect(html).not.toContain('name="investmentRange"');
+    for (const [, type] of html.matchAll(/data-challenge-type="([^"]+)"/g)) expect(type).toBe(mentorshipType);
+    expect(validateLead({ ...lead, challengeType: mentorshipType }).challengeType).toBe(mentorshipType);
   });
 });

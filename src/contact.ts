@@ -136,8 +136,9 @@ export function initContactForm(): void {
       email: String(values.get('email') ?? '').trim(),
       ...(wantsWhatsapp ? { whatsapp: String(values.get('whatsapp') ?? '').trim(), contactPreference: 'whatsapp' as const } : {}),
       companyOrProduct: String(values.get('companyOrProduct') ?? '').trim(),
-      challengeType: String(values.get('challengeType') ?? '') as LeadPayload['challengeType'],
-      investmentRange: String(values.get('investmentRange') ?? '') as LeadPayload['investmentRange'],
+      // /mentoria has no budget field, so empty choices are left out instead of sent blank.
+      ...(values.get('challengeType') ? { challengeType: String(values.get('challengeType')) as LeadPayload['challengeType'] } : {}),
+      ...(values.get('investmentRange') ? { investmentRange: String(values.get('investmentRange')) as LeadPayload['investmentRange'] } : {}),
       challenge: String(values.get('challenge') ?? '').trim(),
       consent: true,
       websiteCheck: String(values.get('websiteCheck') ?? ''),

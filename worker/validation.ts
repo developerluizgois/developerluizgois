@@ -1,4 +1,4 @@
-import { challengeTypes, investmentRanges, attributionKeys, type Attribution } from '../shared/lead';
+import { challengeTypes, mentorshipType, investmentRanges, attributionKeys, type Attribution } from '../shared/lead';
 import type { LeadPayload } from '../shared/lead';
 
 export class PayloadError extends Error {
@@ -41,7 +41,7 @@ export function validateLead(payload: unknown): LeadPayload {
   if (data.contactPreference === 'whatsapp' && !whatsapp) throw new PayloadError();
   const challengeType = data.challengeType === undefined ? undefined : text(data.challengeType, 1, 80);
   const investmentRange = data.investmentRange === undefined ? undefined : text(data.investmentRange, 1, 80);
-  if (challengeType && !challengeTypes.includes(challengeType as typeof challengeTypes[number])) throw new PayloadError();
+  if (challengeType && challengeType !== mentorshipType && !challengeTypes.includes(challengeType as typeof challengeTypes[number])) throw new PayloadError();
   if (investmentRange && !investmentRanges.includes(investmentRange as typeof investmentRanges[number])) throw new PayloadError();
   const attribution: Attribution = {};
   if (data.attribution !== undefined) {
@@ -56,7 +56,7 @@ export function validateLead(payload: unknown): LeadPayload {
       attribution[key as typeof attributionKeys[number]] = clean;
     }
   }
-  return { ...(challengeType ? { challengeType: challengeType as typeof challengeTypes[number] } : {}), ...(investmentRange ? { investmentRange: investmentRange as typeof investmentRanges[number] } : {}), ...(Object.keys(attribution).length ? { attribution } : {}), name, email, ...(whatsapp ? { whatsapp } : {}), ...(data.contactPreference === 'whatsapp' ? { contactPreference: 'whatsapp' as const } : {}), companyOrProduct, challenge, consent: true };
+  return { ...(challengeType ? { challengeType: challengeType as LeadPayload['challengeType'] } : {}), ...(investmentRange ? { investmentRange: investmentRange as typeof investmentRanges[number] } : {}), ...(Object.keys(attribution).length ? { attribution } : {}), name, email, ...(whatsapp ? { whatsapp } : {}), ...(data.contactPreference === 'whatsapp' ? { contactPreference: 'whatsapp' as const } : {}), companyOrProduct, challenge, consent: true };
 }
 
 export async function readLead(request: Request): Promise<LeadPayload> {
