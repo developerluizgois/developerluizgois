@@ -30,7 +30,7 @@
   <main id="conteudo">
     <!-- 1 · Hero: texto, indicadores e projetos, sem header -->
     <section class="hero" id="inicio" aria-labelledby="hero-title">
-      <nav class="wrap audience" aria-label="Para quem é">
+      <nav class="audience" aria-label="Para quem é">
         <a href="/">Para empresas</a>
         <a href="/mentoria/" aria-current="page">Para profissionais</a>
       </nav>
@@ -44,27 +44,30 @@
         </div>
 
         <div class="metrics" data-metrics>
-          <h2 class="sr-only">Resultados que você pode alcançar</h2>
+          <h2 class="sr-only">Onde seu produto deveria estar</h2>
           <ul class="sr-only">
-            <li>Receita: +30% no faturamento de um cliente.</li>
-            <li>Novos clientes: de menos de 1% para cerca de 3% dos novos usuários chegando ao valor do produto.</li>
-            <li>Uso: +53% no uso do que mais importa no produto.</li>
-            <li>Compras: +8% em compras concluídas, com email e WhatsApp.</li>
-            <li>IA: mais de 3 mil análises feitas por IA, sem trabalho manual.</li>
-            <li>Desistências: −12% de desistências na hora de pagar.</li>
+            <li>Aquisição: meta de 7–10% dos visitantes deveriam criar uma conta no seu teste grátis. A média do mercado fica entre 2% e 5%.</li>
+            <li>Ativação: meta de 50–60% de quem se cadastra deveria chegar ao valor do produto. A média do mercado é 37,5%.</li>
+            <li>Primeiros passos: meta de 70–80% deveriam concluir um onboarding curto e guiado. Com checklist, a média é 19%.</li>
+            <li>Primeiro valor: meta de minutos é o tempo que seu usuário deveria levar até o primeiro valor. A média é 1 dia e 12 horas.</li>
+            <li>Boas-vindas: meta de 50%+ de abertura no e-mail de boas-vindas, com 10% a 20% de clique. A média é 20% e 2%.</li>
+            <li>Conversão: meta de 20–25% dos testes sem cartão deveriam virar clientes pagantes. A média do mercado é 18%.</li>
+            <li>Retenção: meta de 55–65% dos usuários deveriam continuar usando depois do primeiro mês. A média é 47%.</li>
+            <li>Cancelamento: meta de menos de 2% é o máximo de clientes que deveria cancelar por mês. A média em empresas pequenas é de 3% a 7%.</li>
+            <li>Receita recorrente: meta de 110%+ é quanto a receita dos clientes atuais deveria render em um ano. A mediana do mercado é 106%.</li>
           </ul>
           <div class="metric-card" aria-hidden="true">
                         <div class="metric-card-face">
-              <p class="mc-label" data-mc-label>Receita</p>
-              <p class="mc-value" data-mc-value><span>+30%</span></p>
-              <p class="mc-aux" data-mc-aux>no faturamento de um cliente</p>
+              <p class="mc-label" data-mc-label>Aquisição</p>
+              <p class="mc-value" data-mc-value><span>↑ 7–10%</span></p>
+              <p class="mc-aux" data-mc-aux>dos visitantes deveriam criar uma conta no seu teste grátis. A média do mercado fica entre 2% e 5%.</p>
               <svg class="mc-chart" viewBox="0 0 360 170">
                 <g class="mc-grid"><line x1="0" y1="20" x2="360" y2="20"/><line x1="0" y1="62" x2="360" y2="62"/><line x1="0" y1="104" x2="360" y2="104"/><line x1="0" y1="146" x2="360" y2="146"/><line x1="0" y1="0" x2="0" y2="146"/><line x1="72" y1="0" x2="72" y2="146"/><line x1="144" y1="0" x2="144" y2="146"/><line x1="216" y1="0" x2="216" y2="146"/><line x1="288" y1="0" x2="288" y2="146"/><line x1="360" y1="0" x2="360" y2="146"/></g>
-                <g class="mc-scene mc-bars is-active" data-chart="0">
+                <g class="mc-scene mc-bars" data-chart="0">
                   <rect x="14" y="108" width="24" height="38" style="--i:0"/><rect x="52" y="102" width="24" height="44" style="--i:1"/><rect x="90" y="104" width="24" height="42" style="--i:2"/><rect x="128" y="96" width="24" height="50" style="--i:3"/><rect x="166" y="90" width="24" height="56" style="--i:4"/>
                   <rect class="mc-after" x="204" y="76" width="24" height="70" style="--i:5"/><rect class="mc-after" x="242" y="62" width="24" height="84" style="--i:6"/><rect class="mc-after" x="280" y="48" width="24" height="98" style="--i:7"/><rect class="mc-after" x="318" y="30" width="24" height="116" style="--i:8"/>
                 </g>
-                <g class="mc-scene mc-funnel" data-chart="1">
+                <g class="mc-scene mc-funnel is-active" data-chart="1">
                   <rect class="mc-after" x="0" y="14" width="340" height="22" style="--i:0"/><rect class="mc-after" x="0" y="48" width="244" height="22" style="--i:1"/><rect class="mc-after" x="0" y="82" width="186" height="22" style="--i:2"/><rect class="mc-after" x="0" y="116" width="122" height="22" style="--i:3"/>
                   <rect class="mc-before" x="0" y="48" width="200" height="22" style="--i:4"/><rect class="mc-before" x="0" y="82" width="140" height="22" style="--i:5"/><rect class="mc-before" x="0" y="116" width="86" height="22" style="--i:6"/>
                 </g>
@@ -93,12 +96,15 @@
           </div>
           <div class="mc-controls">
             <div class="mc-tabs" role="group" aria-label="Escolher resultado">
-              <button type="button" class="mc-tab" data-mc-tab="0" aria-label="Receita" aria-pressed="true"></button>
-              <button type="button" class="mc-tab" data-mc-tab="1" aria-label="Novos clientes" aria-pressed="false"></button>
-              <button type="button" class="mc-tab" data-mc-tab="2" aria-label="Uso" aria-pressed="false"></button>
-              <button type="button" class="mc-tab" data-mc-tab="3" aria-label="Compras" aria-pressed="false"></button>
-              <button type="button" class="mc-tab" data-mc-tab="4" aria-label="IA" aria-pressed="false"></button>
-              <button type="button" class="mc-tab" data-mc-tab="5" aria-label="Desistências" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="0" aria-label="Aquisição" aria-pressed="true"></button>
+              <button type="button" class="mc-tab" data-mc-tab="1" aria-label="Ativação" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="2" aria-label="Primeiros passos" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="3" aria-label="Primeiro valor" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="4" aria-label="Boas-vindas" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="5" aria-label="Conversão" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="6" aria-label="Retenção" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="7" aria-label="Cancelamento" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="8" aria-label="Receita recorrente" aria-pressed="false"></button>
             </div>
             <button type="button" class="mc-pause" data-mc-pause aria-label="Pausar troca automática de resultados" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-pause" d="M5 3v10M11 3v10"/><path class="i-play" d="M5 3l8 5-8 5z"/></svg></button>
           </div>
@@ -118,7 +124,7 @@
         </div>
         <a class="announce" href="https://mentor.wokepeople.com/signup?utm_source=luizgois.com&amp;utm_medium=referral&amp;utm_campaign=luizgois_site&amp;utm_content=hero_announcement" target="_blank" rel="noopener" data-announce>
           <span class="announce-dot" aria-hidden="true"></span>
-          <span>Conheça o mentor de carreira construído para a Woke</span>
+          <span>Veja como estou transformando o mercado com a Woke</span>
           <span class="sr-only">(abre em nova aba)</span>
           <svg class="announce-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg>
         </a>

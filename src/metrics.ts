@@ -1,16 +1,20 @@
 import { trackEvent } from './analytics';
 
+// Market benchmarks from Luiz's table: the label is the funnel stage, the value is where a well-built product should be.
 const metrics = [
-  { id: 'receita', label: 'Receita', value: '+30%', aux: 'no faturamento de um cliente' },
-  { id: 'conversao', label: 'Novos clientes', value: '<1% → 3%', aux: 'dos novos usuários chegando ao valor do produto' },
-  { id: 'engajamento', label: 'Uso', value: '+53%', aux: 'no uso do que mais importa no produto' },
-  { id: 'relacionamento', label: 'Compras', value: '+8%', aux: 'em compras concluídas, com email e WhatsApp' },
-  { id: 'ia', label: 'IA', value: '+3 mil', aux: 'análises feitas por IA, sem trabalho manual' },
-  { id: 'abandono', label: 'Desistências', value: '−12%', aux: 'na hora de pagar' },
+  { id: 'aquisicao', label: 'Aquisição', value: '↑ 7–10%', aux: 'dos visitantes deveriam criar uma conta no seu teste grátis. A média do mercado fica entre 2% e 5%.', chart: 1 },
+  { id: 'ativacao', label: 'Ativação', value: '↑ 50–60%', aux: 'de quem se cadastra deveria chegar ao valor do produto. A média do mercado é 37,5%.', chart: 2 },
+  { id: 'onboarding', label: 'Primeiros passos', value: '↑ 70–80%', aux: 'deveriam concluir um onboarding curto e guiado. Com checklist, a média é 19%.', chart: 0 },
+  { id: 'primeiro-valor', label: 'Primeiro valor', value: '↓ minutos', aux: 'é o tempo que seu usuário deveria levar até o primeiro valor. A média é 1 dia e 12 horas.', chart: 5 },
+  { id: 'boas-vindas', label: 'Boas-vindas', value: '↑ 50%+', aux: 'de abertura no e-mail de boas-vindas, com 10% a 20% de clique. A média é 20% e 2%.', chart: 4 },
+  { id: 'conversao', label: 'Conversão', value: '↑ 20–25%', aux: 'dos testes sem cartão deveriam virar clientes pagantes. A média do mercado é 18%.', chart: 3 },
+  { id: 'retencao', label: 'Retenção', value: '↑ 55–65%', aux: 'dos usuários deveriam continuar usando depois do primeiro mês. A média é 47%.', chart: 2 },
+  { id: 'cancelamento', label: 'Cancelamento', value: '↓ < 2%', aux: 'é o máximo de clientes que deveria cancelar por mês. A média em empresas pequenas é de 3% a 7%.', chart: 5 },
+  { id: 'receita', label: 'Receita recorrente', value: '↑ 110%+', aux: 'é quanto a receita dos clientes atuais deveria render em um ano. A mediana do mercado é 106%.', chart: 3 },
 ] as const;
 const INTERVAL = 4800;
 
-// Rotating card of results the work can reach, kept generic so no client is named. The same data is listed for screen readers, so the rotation is visual only.
+// Rotating card of where a product should be at each stage. The same data is listed for screen readers, so the rotation is visual only.
 export function initMetrics(): void {
   const root = document.querySelector<HTMLElement>('[data-metrics]');
   if (!root) return;
@@ -47,7 +51,7 @@ export function initMetrics(): void {
     label.textContent = metric.label;
     aux.classList.add('is-swapping');
     window.setTimeout(() => { aux.textContent = metric.aux; aux.classList.remove('is-swapping'); }, reduced.matches ? 0 : 180);
-    scenes.forEach((scene, i) => scene.classList.toggle('is-active', i === index));
+    scenes.forEach((scene, i) => scene.classList.toggle('is-active', i === metric.chart));
     tabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === index)));
     current = index;
   }

@@ -8,7 +8,7 @@ describe('FAQ structured data', () => {
     const faq = faqFromHtml(html);
     expect(faq).toHaveLength((html.match(/class="faq-item"/g) ?? []).length);
     expect(faq.length).toBeGreaterThan(0);
-    expect(faq.find(item => item.question === 'Quanto custa?')?.answer).toContain('a partir de R$ 10 mil');
+    expect(faq.find(item => item.question === 'Quanto custa?')?.answer).toContain('R$ 8 mil');
     for (const { question, answer } of faq) {
       expect(question).not.toMatch(/[<>]|&\w+;/);
       expect(answer).not.toMatch(/[<>]|&\w+;/);
