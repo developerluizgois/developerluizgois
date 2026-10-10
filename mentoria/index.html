@@ -44,8 +44,15 @@
         </div>
 
         <div class="metrics" data-metrics>
-          <h2 class="sr-only">Um resultado</h2>
-          <p class="sr-only">Receita: +30% no faturamento de um cliente.</p>
+          <h2 class="sr-only">Resultados que você pode alcançar</h2>
+          <ul class="sr-only">
+            <li>Receita: +30% no faturamento de um cliente.</li>
+            <li>Novos clientes: de menos de 1% para cerca de 3% dos novos usuários chegando ao valor do produto.</li>
+            <li>Uso: +53% no uso do que mais importa no produto.</li>
+            <li>Compras: +8% em compras concluídas, com email e WhatsApp.</li>
+            <li>IA: mais de 3 mil análises feitas por IA, sem trabalho manual.</li>
+            <li>Desistências: −12% de desistências na hora de pagar.</li>
+          </ul>
           <div class="metric-card" aria-hidden="true">
                         <div class="metric-card-face">
               <p class="mc-label" data-mc-label>Receita</p>
@@ -57,8 +64,43 @@
                   <rect x="14" y="108" width="24" height="38" style="--i:0"/><rect x="52" y="102" width="24" height="44" style="--i:1"/><rect x="90" y="104" width="24" height="42" style="--i:2"/><rect x="128" y="96" width="24" height="50" style="--i:3"/><rect x="166" y="90" width="24" height="56" style="--i:4"/>
                   <rect class="mc-after" x="204" y="76" width="24" height="70" style="--i:5"/><rect class="mc-after" x="242" y="62" width="24" height="84" style="--i:6"/><rect class="mc-after" x="280" y="48" width="24" height="98" style="--i:7"/><rect class="mc-after" x="318" y="30" width="24" height="116" style="--i:8"/>
                 </g>
+                <g class="mc-scene mc-funnel" data-chart="1">
+                  <rect class="mc-after" x="0" y="14" width="340" height="22" style="--i:0"/><rect class="mc-after" x="0" y="48" width="244" height="22" style="--i:1"/><rect class="mc-after" x="0" y="82" width="186" height="22" style="--i:2"/><rect class="mc-after" x="0" y="116" width="122" height="22" style="--i:3"/>
+                  <rect class="mc-before" x="0" y="48" width="200" height="22" style="--i:4"/><rect class="mc-before" x="0" y="82" width="140" height="22" style="--i:5"/><rect class="mc-before" x="0" y="116" width="86" height="22" style="--i:6"/>
+                </g>
+                <g class="mc-scene" data-chart="2">
+                  <path class="mc-line" pathLength="1" d="M0 130 L30 126 L60 128 L90 118 L120 120 L150 108 L180 100 L210 96 L240 84 L270 74 L300 60 L330 50 L356 38"/>
+                  <circle class="mc-dot" cx="356" cy="38" r="5"/>
+                </g>
+                <g class="mc-scene" data-chart="3">
+                  <line class="mc-base" x1="0" y1="118" x2="360" y2="118"/>
+                  <line class="mc-marker" x1="180" y1="0" x2="180" y2="146"/>
+                  <path class="mc-line" pathLength="1" d="M0 120 L36 116 L72 121 L108 117 L144 119 L180 118 L216 104 L252 90 L288 78 L324 66 L356 58"/>
+                  <circle class="mc-dot" cx="356" cy="58" r="5"/>
+                </g>
+                <g class="mc-scene" data-chart="4">
+                  <path class="mc-line mc-line-before" pathLength="1" d="M0 124 C 90 118 200 110 356 104"/>
+                  <path class="mc-line" pathLength="1" d="M0 124 C 80 104 180 70 356 40"/>
+                  <circle class="mc-dot" cx="356" cy="40" r="5"/>
+                </g>
+                <g class="mc-scene" data-chart="5">
+                  <line class="mc-base" x1="0" y1="36" x2="360" y2="36"/>
+                  <path class="mc-line" pathLength="1" d="M0 36 L32 40 L64 38 L96 46 L128 52 L160 60 L192 68 L224 76 L256 86 L288 94 L320 102 L356 110"/>
+                  <circle class="mc-dot" cx="356" cy="110" r="5"/>
+                </g>
               </svg>
             </div>
+          </div>
+          <div class="mc-controls">
+            <div class="mc-tabs" role="group" aria-label="Escolher resultado">
+              <button type="button" class="mc-tab" data-mc-tab="0" aria-label="Receita" aria-pressed="true"></button>
+              <button type="button" class="mc-tab" data-mc-tab="1" aria-label="Novos clientes" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="2" aria-label="Uso" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="3" aria-label="Compras" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="4" aria-label="IA" aria-pressed="false"></button>
+              <button type="button" class="mc-tab" data-mc-tab="5" aria-label="Desistências" aria-pressed="false"></button>
+            </div>
+            <button type="button" class="mc-pause" data-mc-pause aria-label="Pausar troca automática de resultados" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-pause" d="M5 3v10M11 3v10"/><path class="i-play" d="M5 3l8 5-8 5z"/></svg></button>
           </div>
         </div>
       </div>
