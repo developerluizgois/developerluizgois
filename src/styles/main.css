@@ -88,8 +88,13 @@ h1, h2, h3, .hero h1 em, h2 em { text-wrap: balance; }
 .center-head h2 em { color: var(--muted); }
 
 /* 1 · Hero — full screen navy, three zones, no header. */
-.hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; background: var(--navy-950); color: var(--on-navy); padding-top: clamp(40px, 8vh, 96px); }
+.hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; background: var(--navy-950); color: var(--on-navy); padding-top: clamp(88px, 11vh, 120px); }
 .hero-top { padding-bottom: clamp(40px, 7vh, 80px); }
+/* Two-way switch between the company page and the mentorship page. */
+.audience { position: absolute; top: clamp(16px, 3vh, 28px); left: 0; right: 0; z-index: 2; display: flex; gap: 4px; }
+.audience a { padding: 8px 14px; border: 1px solid transparent; border-radius: 999px; font-size: 14px; color: var(--on-navy-muted); text-decoration: none; transition: color .2s, border-color .2s; }
+.audience a:hover { color: var(--on-navy); }
+.audience a[aria-current="page"] { border-color: var(--navy-700); color: var(--on-navy); }
 .hero-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: center; }
 .hero-copy { grid-column: 1 / span 7; }
 .hero h1 { font-family: var(--display); font-size: clamp(44px, 5.2vw, 84px); line-height: 1.02; letter-spacing: -.045em; }
@@ -429,7 +434,7 @@ html.is-locked { overflow: hidden; }
 /* Mobile: recomposed. The first screen is still the navy hero. */
 @media (max-width: 700px) {
   body { font-size: 16px; }
-  .hero { padding-top: 40px; }
+  .hero { padding-top: 88px; }
   .hero h1 { font-size: clamp(32px, 9.4vw, 44px); }
   .hero-lead { font-size: 17px; }
   .metric-card { width: 100%; }

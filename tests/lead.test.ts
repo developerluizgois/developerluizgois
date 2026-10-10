@@ -5,7 +5,7 @@ import { createLeadPage, richText, NOTION_VERSION } from '../worker/notion';
 import { assessLead } from '../worker/assessment';
 import { finalScore, provisionalScore, tierFor } from '../worker/scoring';
 import worker, { enrichLead } from '../worker/index';
-import { challengeTypes, investmentRanges } from '../shared/lead';
+import { challengeTypes, investmentRanges, mentorshipType } from '../shared/lead';
 import { createSubmission } from '../src/contact';
 import type { FormState } from '../src/contact';
 
@@ -247,5 +247,15 @@ describe('qualification and attribution', () => {
     vi.stubGlobal('window', { dataLayer: [] });
     expect(await createSubmission(vi.fn<typeof fetch>(fetcher))(lead, () => {})).toBe(false);
     expect(window.dataLayer).toEqual(['form_submit', 'contact_form_submit', 'form_submit_error', 'contact_form_error'].map(event => ({ event, form_provider: 'notion' })));
+  });
+});
+
+describe('mentorship page', () => {
+  it('sends the mentorship type as a hidden field the server accepts', () => {
+    const html = readFileSync(new URL('../mentoria/index.html', import.meta.url), 'utf8');
+    expect(html).toContain(`<input type="hidden" name="challengeType" value="${mentorshipType}">`);
+    expect(html).not.toContain('name="investmentRange"');
+    for (const [, type] of html.matchAll(/data-challenge-type="([^"]+)"/g)) expect(type).toBe(mentorshipType);
+    expect(validateLead({ ...lead, challengeType: mentorshipType }).challengeType).toBe(mentorshipType);
   });
 });

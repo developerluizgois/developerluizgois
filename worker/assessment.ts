@@ -23,7 +23,9 @@ Dê notas inteiras:
 - clarity (0 a 15): alto quando o problema, o contexto e o que já foi tentado estão descritos com fatos ou números. Baixo para texto vago ou genérico.
 
 reason: uma frase curta em português que explique as notas para Luiz.
-first_question: a primeira pergunta, em português, que Luiz deveria fazer na conversa para entender o caso.`;
+first_question: a primeira pergunta, em português, que Luiz deveria fazer na conversa para entender o caso.
+
+Quando o tipo de desafio for "Mentoria 1:1", o contato é um profissional pedindo mentoria individual (programa de 3 meses por R$ 4.800 ou sessão avulsa de R$ 500), e "Empresa ou produto" traz o que a pessoa faz hoje. Nesse caso, fit é alto para quem já trabalha com software (engenharia, design ou produto) e quer aprender a construir o que vende; baixo para quem ainda não programa ou pede emprego. urgency é alto quando há um objetivo próximo (projeto, promoção, mudança de área). clarity segue a mesma regra.`;
 
 const cap = (value: string, max: number) => value.replace(/\s+/g, ' ').trim().slice(0, max);
 

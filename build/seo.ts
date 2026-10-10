@@ -35,16 +35,20 @@ export function seoPlugin(siteUrl?: string): Plugin {
   const url = publicSiteUrl(siteUrl);
   return {
     name: 'landing-seo',
-    transformIndexHtml(html) {
+    transformIndexHtml(html, ctx) {
       const tags: import('vite').HtmlTagDescriptor[] = [
         { tag: 'meta', attrs: { name: 'robots', content: url ? 'index, follow, max-image-preview:large' : 'noindex, nofollow' }, injectTo: 'head' },
       ];
       if (!url) return tags;
+      // Each page is canonical at its own folder; title and description come from the page itself.
+      const page = url + (ctx.path.replace(/^\//, '').replace(/index\.html$/, ''));
+      const title = decode(html.match(/<title>([^<]*)<\/title>/)?.[1] ?? 'Luiz Gois');
+      const description = decode(html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '');
       const image = url + ogImage.path;
       const faq = faqFromHtml(html);
       tags.push(
-        { tag: 'link', attrs: { rel: 'canonical', href: url }, injectTo: 'head' },
-        { tag: 'meta', attrs: { property: 'og:url', content: url }, injectTo: 'head' },
+        { tag: 'link', attrs: { rel: 'canonical', href: page }, injectTo: 'head' },
+        { tag: 'meta', attrs: { property: 'og:url', content: page }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image', content: image }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image:width', content: String(ogImage.width) }, injectTo: 'head' },
         { tag: 'meta', attrs: { property: 'og:image:height', content: String(ogImage.height) }, injectTo: 'head' },
@@ -55,12 +59,12 @@ export function seoPlugin(siteUrl?: string): Plugin {
         { tag: 'script', attrs: { type: 'application/ld+json' }, injectTo: 'head', children: JSON.stringify({
           '@context': 'https://schema.org',
           '@graph': [
-            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image: url + portrait, jobTitle: 'Engenheiro de produto e growth', description: 'Engenheiro de produto e growth há mais de 6 anos, construindo ativação, conversão e retenção para empresas de software.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'],
+            { '@type': 'Person', '@id': url + '#luiz', name: 'Luiz Gois', url, image: url + portrait, jobTitle: 'Engenheiro de produto', description: 'Engenheiro de produto há mais de 6 anos, construindo produtos que as pessoas entendem, usam, compram e continuam usando.', sameAs: ['https://www.linkedin.com/in/euluizgois/', 'https://x.com/euluizgois', 'https://www.instagram.com/euluizgois/'],
               knowsAbout: ['Engenharia de produto', 'Growth', 'Ativação de usuários', 'Onboarding', 'Conversão', 'Monetização', 'Retenção', 'Churn', 'Inteligência artificial', 'Automação de WhatsApp'],
               makesOffer: services.map(([name, description]) => ({ '@type': 'Offer', areaServed: { '@type': 'Country', name: 'Brasil' }, itemOffered: { '@type': 'Service', name, description, provider: { '@id': url + '#luiz' } } })) },
             { '@type': 'WebSite', '@id': url + '#website', url, name: 'Luiz Gois', alternateName: 'luizgois.com', inLanguage: 'pt-BR', publisher: { '@id': url + '#luiz' } },
-            { '@type': 'WebPage', '@id': url + '#webpage', url, name: 'Produto, Growth & Engenharia para quem faz diferente | Luiz Gois', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, primaryImageOfPage: { '@type': 'ImageObject', url: image, width: ogImage.width, height: ogImage.height }, description: 'Uma experiência que faz seu software vender mais e seu cliente ficar. Produto, growth e engenharia, com dados e IA.' },
-            ...(faq.length ? [{ '@type': 'FAQPage', '@id': url + '#perguntas', url: url + '#perguntas', inLanguage: 'pt-BR', isPartOf: { '@id': url + '#webpage' }, mainEntity: faq.map(({ question, answer }) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) }] : []),
+            { '@type': 'WebPage', '@id': page + '#webpage', url: page, name: title, inLanguage: 'pt-BR', isPartOf: { '@id': url + '#website' }, about: { '@id': url + '#luiz' }, primaryImageOfPage: { '@type': 'ImageObject', url: image, width: ogImage.width, height: ogImage.height }, description },
+            ...(faq.length ? [{ '@type': 'FAQPage', '@id': page + '#perguntas', url: page + '#perguntas', inLanguage: 'pt-BR', isPartOf: { '@id': page + '#webpage' }, mainEntity: faq.map(({ question, answer }) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })) }] : []),
           ],
         }).replace(/</g, '\\u003c') },
       );
@@ -71,7 +75,7 @@ export function seoPlugin(siteUrl?: string): Plugin {
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: url
         ? `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${url}sitemap.xml\n`
         : 'User-agent: *\nAllow: /\n# Preview: HTML is marked noindex until SITE_URL is configured.\n' });
-      if (url) this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${url}</loc></url></urlset>\n` });
+      if (url) this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${url}</loc></url><url><loc>${url}mentoria/</loc></url></urlset>\n` });
     },
   };
 }
